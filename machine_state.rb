@@ -7,8 +7,8 @@ class MachineState
 		number = state_number		
 	end
 
-	def set_behavior(input, behavior)
-		instruction_hash[input] = behavior
+	def set_behavior(behavior_hash)
+		instruction_hash.merge(behavior_hash)
 	end
 
 	def get_behavior(input)
