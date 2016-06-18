@@ -1,4 +1,4 @@
-
+require 'colorize'
 
 class Tape
 
@@ -19,7 +19,7 @@ class Tape
 	end
 
 	def rendercurrent
-		print @current_square
+		print "[#{@current_square}]".red
 	end
 
 	def renderright
@@ -28,4 +28,20 @@ class Tape
 	end
 
 
+	def move_left
+		@left << @current_square
+		@current_square = @right.shift
+		@right << :"0"
+	end
+
+	def move_right
+		@right.unshift @current_square
+		@current_square = @left.pop
+		@left.unshift :"0"
+	end
+
+	def change_mark(new_mark)
+		@current_square = new_mark
+	end
 end
+
