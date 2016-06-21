@@ -1,13 +1,18 @@
 require_relative 'machine_state'
 require_relative 'tape'
+require 'byebug'
+
 
 class ProgramReader
+	attr_reader :tape
 
 	def initialize
 		@counter = 0
-		@tape = Tape.new
-		null_state = MachineState.halt(0)
-		@program_start = null_state
+		@tape = Tape.new([:x,:x,:x,:"0",:x,:x])
+		#first_state = MachineState.halt(0)
+		#first_state = MachineState.make_simple_program
+		first_state = MachineState.make_adder
+		@program_state = first_state
 		@finished = false
 	end
 
@@ -25,11 +30,15 @@ class ProgramReader
 				@finished = true
 				break
 			when :right
+				tape.move_right_one_full
 			when :left
+				tape.move_left_one_full
 			when :markx
+				tape.change_mark(:x)
 			when :mark0
+				tape.change_mark(:"0")
 			end
-			@program_state = @program_state.get_next_state
+			@program_state = @program_state.get_next_state(current_symbol)
 		end
 	end
 
