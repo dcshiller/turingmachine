@@ -29,7 +29,8 @@ class MachineState
 		third.set_behavior({:x => [:right,third], :"0" => [:right,fourth]})
 		fourth.set_behavior({:x => [:right,fourth], :"0" => [:markx, fifth]})
 		fifth.set_behavior({:x => [:left,fifth], :"0" => [:left,sixth]})
-		sixth.set_behavior({:x => [:right,sixth], :"0" => [:right,first]})
+		sixth.set_behavior({:x => [:left,sixth], :"0" => [:right,first]})
+		#sevent.set_behavior({:x => [:right,sixth], :"0" => [:right,first]})
 		first
 	end
 
