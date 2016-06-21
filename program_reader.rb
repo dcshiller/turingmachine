@@ -43,3 +43,9 @@ class ProgramReader
 	end
 
 end
+
+
+if __FILE__ == $PROGRAM_NAME
+	p = ProgramReader.new
+	p.run_program
+end
