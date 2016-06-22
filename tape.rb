@@ -25,14 +25,14 @@ class Tape
 	def move_left_one_full
 		3.times do
 			move_left_one_third
-			sleep(1)
+			sleep(0.5)
 		end
 	end
 
 	def move_right_one_full
 		3.times do
 			move_right_one_third
-			sleep(1)
+			sleep(0.5)
 		end
 	end
 
