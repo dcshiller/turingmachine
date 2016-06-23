@@ -42,7 +42,15 @@ class ProgramReader
 				@program_state = @program_state.get_next_state(current_symbol)
 			end
 		end
+
+		t2 = Thread.new do
+			loop do
+				print @program_state
+				sleep(0.25)
+			end
+		end
 		t1.join
+		t2.join
 	end
 
 end
