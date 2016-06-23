@@ -23,22 +23,24 @@ class Tape
 	end
 
 	def move_left_one_full
-		3.times do
+		3.times do |idx|
 			move_left_one_third
-			sleep(0.5)
+			sleep(0.1)
+			sleep(0.5) if idx == 2
 		end
 	end
 
 	def move_right_one_full
-		3.times do
+		3.times do |idx|
 			move_right_one_third
-			sleep(0.5)
+			sleep(0.1)
+			sleep(0.5) if idx == 2
 		end
 	end
 
 	def render
-		system("clear")
 		tape_string = build_tape_string
+		system("clear")
 		5.times {puts}
 		puts tape_string
 		# renderleft(offset)
