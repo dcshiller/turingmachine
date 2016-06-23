@@ -15,6 +15,7 @@ class ProgramReader
 		first_state = MachineState.make_adder
 		@program_state = first_state
 		@finished = false
+	
 	end
 
 	def counter
