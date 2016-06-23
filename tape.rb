@@ -42,11 +42,13 @@ class Tape
 		tape_string = build_tape_string
 		system("clear")
 		5.times {puts}
+		render_down_arrow
 		puts tape_string
 		# renderleft(offset)
 		# rendercurrent(offset)
 		# renderright(offset)
-		render_arrow
+		render_up_arrow
+		5.times {puts}
 	end
 
 
@@ -114,9 +116,15 @@ class Tape
 		render
 	end
 
-	def render_arrow
+	def render_down_arrow
 		31.times {print " "}
-		print "^".blink
+		print "\u25BC".encode("utf-8")
+		puts
+	end
+
+	def render_up_arrow
+		31.times {print " "}
+		print "\u25B2".encode("utf-8")
 		puts
 	end
 
