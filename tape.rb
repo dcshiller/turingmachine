@@ -1,25 +1,25 @@
 require 'colorize'
+require_relative 'space'
 
 class Tape
-	attr_reader :left, :right, :current_square, :offset
+	attr_reader :left, :right, :current_space, :offset
+	alias  :left_spaces :left
+	alias :right_spaces :right
 
-	def change_mark(new_mark)
-		sleep(1)
-		@current_square = new_mark
-		render
-		sleep(1)
-	end
-
-	def initialize(arguments = Array.new {:"0"})
-		@left = Array.new(15, :"0")
-		@current_square = arguments.first || :"x"
-		@right = arguments + Array.new(15, :"0")
-		@color_tracker = [:light_black, :black]
+	def initialize(arguments = Array.new {Space.new})
+		@left = Array.new(15, Space.new)
+		@first_space = Space.new(:red,:x)
+		@current_space = @first_space
+		@right = arguments + Array.new(15, Space.new)
 		@offset = 0
 	end
 
-	def get_symbol_under_reader
-		@current_square
+	def write_mark(new_mark)
+		current_space.write_mark(new_mark)
+	end
+
+	def get_mark_under_reader
+		current_space.read_mark
 	end
 
 	def move_left_one_full
@@ -38,94 +38,32 @@ class Tape
 		end
 	end
 
-	def render
-		tape_string = build_tape_string
-		system("clear")
-		5.times {puts}
-		render_down_arrow
-		puts tape_string
-		# renderleft(offset)
-		# rendercurrent(offset)
-		# renderright(offset)
-		render_up_arrow
-		5.times {puts}
-	end
-
-
 	private
 
-	def adjust_square_right
-		@left = @left.unshift(@current_square)
-		@current_square = @right.shift
-		@right << :"0"
+	def adjust_space_right
+		@left = @left.unshift(@current_space)
+		@current_space = @right.shift
+		@right << Space.new
 	end
-	def adjust_square_left
-		@right = @right.unshift(@current_square)
-		@current_square = @left.shift
-		@left << :"0"
-	end
-
-	def build_square(color, square_symbol = " ")
-		square_array = []
-		square_array << " ".colorize(background: color)
-		square_array << "#{square_symbol}".colorize(background: color)
-		square_array << " ".colorize(background: color)
-		square_array
-	end
-
-	def build_tape_string
-		string_array = []
-		10.times do |idx|
-			string_array += build_square(@color_tracker[0],@left[9-idx])
-			@color_tracker.rotate!(1)
-		end
-		string_array += build_square(@color_tracker[0],@current_square)
-		@color_tracker.rotate!(1)
-		10.times do |idx|
-			string_array += build_square(@color_tracker[0],@right[idx])
-			@color_tracker.rotate!(1)
-		end
-
-		if @offset > 0
-			(@offset).times {string_array.shift}
-		elsif offset < 0
-			extra_left_square = [" ".blue,"#{@left[10]}".blue," ".blue]
-			(@offset*-1).times {|idx| string_array.unshift(extra_left_square.pop)} #needswork?
-		end
-		@color_tracker.rotate!(1)
-		string_array.join("")
+	def adjust_space_left
+		@right = @right.unshift(@current_space)
+		@current_space = @left.shift
+		@left << Space.new
 	end
 
 	def move_right_one_third
 		@offset +=1
 		if @offset == 3
 			@offset = 0
-			adjust_square_right
-			@color_tracker = @color_tracker.rotate
+			adjust_space_right
 		end
-		render
 	end
 
 	def move_left_one_third
 		@offset +=-1
 		if @offset == -3
 			@offset = 0
-			adjust_square_left
-			@color_tracker = @color_tracker.rotate
+			adjust_space_left
 		end
-		render
 	end
-
-	def render_down_arrow
-		31.times {print " "}
-		print "\u25BC".encode("utf-8")
-		puts
-	end
-
-	def render_up_arrow
-		31.times {print " "}
-		print "\u25B2".encode("utf-8")
-		puts
-	end
-
 end

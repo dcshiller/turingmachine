@@ -35,6 +35,10 @@ class MachineState
 		first
 	end
 
+	def to_s
+		number.to_s + ":   (" + instruction_hash.collect {|key, value| key.to_s + "=>" + value.first.to_s + " " + value.last.number.to_s}.join(", ") + ")"
+	end
+
 	def self.halt(state_number = 0)
 		halt_state = MachineState.new(state_number)
 		halt_state.number = state_number
