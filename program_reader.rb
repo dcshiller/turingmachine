@@ -8,6 +8,7 @@ class ProgramReader
 	attr_reader :tape
 
 	def initialize
+		@pause = false
 		@counter = 0
 		@tape = Tape.new(:x,:x,:x,:"0",:x,:x)
 		@display = Display.new(@tape)
@@ -16,6 +17,7 @@ class ProgramReader
 		first_state = MachineState.make_adder
 		@program_state = first_state
 		@finished = false
+
 		at_exit {system("clear")}
 	end
 
@@ -27,6 +29,9 @@ class ProgramReader
 		t1 = Thread.new do
 			until @finished
 				@tape.render
+				while @pause
+					sleep(5)
+				end
 				current_symbol = @tape.get_symbol_under_reader
 				next_action = @program_state.get_behavior(current_symbol)
 				case next_action
@@ -45,7 +50,16 @@ class ProgramReader
 				@program_state = @program_state.get_next_state(current_symbol)
 			end
 		end
+
+		t2 = Thread.new do
+			loop do
+				@pause = !@pause if gets.chomp == "p"
+				print @program_state
+				sleep(0.25)
+			end
+		end
 		t1.join
+		t2.join
 	end
 
 end
