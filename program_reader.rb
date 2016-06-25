@@ -65,9 +65,9 @@ class ProgramReader
 				sleep(0.25)
 			end
 		end
-		thread_render.join
+		#thread_render.join
 		t1.join
-		#t2.join
+		t2.join
 	end
 
 end

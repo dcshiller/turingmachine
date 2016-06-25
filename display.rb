@@ -1,3 +1,5 @@
+require 'byebug'
+
 
 class Display
 
@@ -20,17 +22,17 @@ class Display
 	def build_tape_string
 		string_array = []
 		10.times do |idx|
-			string_array.unshift(tape.left_spaces[idx].to_s)
+			string_array.unshift(tape.left_spaces[idx].to_s.split(""))
 		end
-		string_array << tape.current_space.to_s
+		string_array << tape.current_space.to_s.split("")
 		10.times do |idx|
-			string_array << tape.right_spaces[idx].to_s
+			string_array << tape.right_spaces[idx].to_s.split("")
 		end
 
     offset = tape.offset
 
     if offset > 0
-			(offset).times {string_array.shift}
+			(offset).times {string_array}
 		elsif offset < 0
 			extra_left_square = [" ".blue,"#{@left[10]}".blue," ".blue]
 			(offset*-1).times {|idx| string_array.unshift(extra_left_square.pop)} #needswork?
