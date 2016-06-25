@@ -13,11 +13,10 @@ class ProgramReader
 		@tape = Tape.new(:x,:x,:x,:"0",:x,:x)
 		@display = Display.new(@tape)
 		#first_state = MachineState.halt(0)
-		#first_state = MachineState.make_simple_program
 		first_state = MachineState.make_adder
+		#first_state = MachineState.make_adder
 		@program_state = first_state
 		@finished = false
-
 		at_exit {system("clear")}
 	end
 
@@ -25,20 +24,20 @@ class ProgramReader
 		@counter += 1
 	end
 
-	def run_program
 
-		thread_render = Thread.new do
+	def display_thread
+		Thread.new do
 			loop do
-				@display.render
+				@display.render(@program_state)
 				sleep(0.1)
+				Thread.pass
 			end
 		end
+	end
 
-		t1 = Thread.new do
+	def program_thread
+		Thread.new do
 			until @finished
-				while @pause
-					sleep(5)
-				end
 				current_mark = @tape.get_mark_under_reader
 				next_action = @program_state.get_behavior(current_mark)
 				case next_action
@@ -46,28 +45,54 @@ class ProgramReader
 					@finished = true
 					break
 				when :right
-					tape.move_right_one_full
+					move_right
+					#tape.move_right_one_full
 				when :left
-					tape.move_left_one_full
+					move_left
 				when :markx
-					tape.write_mark(:x)
+					write_mark(:x)
 				when :mark0
-					tape.write_mark(:"0")
+					write_mark(:"0")
 				end
 				@program_state = @program_state.get_next_state(current_mark)
 			end
 		end
+	end
 
-		t2 = Thread.new do
-			loop do
-				@pause = !@pause if gets.chomp == "p"
-				print @program_state
-				sleep(0.25)
-			end
-		end
-		#thread_render.join
-		t1.join
-		t2.join
+	def write_mark(mark)
+		sleep(0.5)
+		tape.write_mark(mark)
+		sleep(0.5)
+	end
+
+	def run_program
+		display = display_thread
+		program_thread.join
+		display_thread.join
+	end
+
+	def move_right
+		tape.offset_right
+		sleep(0.2)
+		Thread.pass
+		tape.offset_right
+		sleep(0.2)
+		Thread.pass
+		tape.offset_right
+		sleep(0.5)
+		Thread.pass
+	end
+
+	def move_left
+		tape.offset_left
+		sleep(0.2)
+		Thread.pass
+		tape.offset_left
+		sleep(0.2)
+		Thread.pass
+		tape.offset_left
+		sleep(0.5)
+		Thread.pass
 	end
 
 end

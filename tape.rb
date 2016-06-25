@@ -2,16 +2,17 @@ require 'colorize'
 require_relative 'space'
 
 class Tape
-	attr_reader :left, :right, :current_space, :offset
+	attr_reader :left, :right, :current_space
+	attr_accessor :offset
 	alias  :left_spaces :left
 	alias :right_spaces :right
 	COLORS = [:black, :light_black]
 
 	def initialize(*arguments)
 		@left = Array.new(15) {|idx| Space.new(color(idx))}
-		@current_space = Space.new(color(1), :x)
+		@current_space = Space.new(color(1), arguments.shift)
 		arguments = arguments.collect.with_index {|mark, idx| Space.new(color(idx), mark) }
-		@right = arguments + Array.new(15) {|idx| Space.new(color(idx))}
+		@right = arguments + Array.new(15) {|idx| Space.new(color(idx % 2+1))}
 		@offset = 0
 	end
 
@@ -23,51 +24,38 @@ class Tape
 		current_space.write_mark(new_mark)
 	end
 
+	def offset_right
+		@offset += 1
+		if @offset > 2
+			@offset = 0
+			move_right_one_full
+		end
+	end
+
+	def offset_left
+		@offset -= 1
+		if @offset < -2
+			@offset = 0
+			move_left_one_full
+		end
+	end
+
 	def get_mark_under_reader
 		current_space.read_mark
 	end
 
 	def move_left_one_full
-		3.times do |idx|
-			move_left_one_third
-			idx == 2 ? sleep(1) : sleep(0.2)
-		end
-	end
-
-	def move_right_one_full
-		3.times do |idx|
-			move_right_one_third
-			idx == 2 ? sleep(1) : sleep(0.5)
-		end
-	end
-
-	private
-
-	def adjust_space_right
-		@left = @left.unshift(@current_space)
-		@current_space = @right.shift
-		@right << Space.new #TODO add colors
-	end
-	def adjust_space_left
 		@right = @right.unshift(@current_space)
 		@current_space = @left.shift
 		@left << Space.new
 	end
 
-	def move_right_one_third
-		@offset +=1
-		puts @offset
-		if @offset == 3
-			@offset = 0
-			adjust_space_right
-		end
+	def move_right_one_full
+		@left = @left.unshift(@current_space)
+		@current_space = @right.shift
+		@right << Space.new #TODO add colors
 	end
 
-	def move_left_one_third
-		@offset +=-1
-		if @offset == -3
-			@offset = 0
-			adjust_space_left
-		end
-	end
+	private
+	
 end
