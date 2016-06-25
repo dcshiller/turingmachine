@@ -30,14 +30,14 @@ class Tape
 	def move_left_one_full
 		3.times do |idx|
 			move_left_one_third
-			idx == 2 ? sleep(0.5) : sleep(.1)
+			idx == 2 ? sleep(1) : sleep(0.2)
 		end
 	end
 
 	def move_right_one_full
 		3.times do |idx|
 			move_right_one_third
-			idx == 2 ? sleep(0.5) : sleep(.1)
+			idx == 2 ? sleep(1) : sleep(0.5)
 		end
 	end
 
