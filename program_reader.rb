@@ -9,7 +9,7 @@ class ProgramReader
 
 	def initialize
 		@counter = 0
-		@tape = Tape.new([:x,:x,:x,:"0",:x,:x])
+		@tape = Tape.new(:x,:x,:x,:"0",:x,:x)
 		@display = Display.new(@tape)
 		#first_state = MachineState.halt(0)
 		#first_state = MachineState.make_simple_program
@@ -25,7 +25,7 @@ class ProgramReader
 
 	def run_program
 		until @finished
-			@display.render
+			@display_render
 			current_mark = @tape.get_mark_under_reader
 			next_action = @program_state.get_behavior(current_mark)
 			case next_action
