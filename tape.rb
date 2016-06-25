@@ -9,14 +9,14 @@ class Tape
 	COLORS = [:black, :light_black]
 
 	def initialize(*arguments)
-		@left = Array.new(15) {|idx| Space.new(color(idx))}
-		@current_space = Space.new(color(1), arguments.shift)
-		arguments = arguments.collect.with_index {|mark, idx| Space.new(color(idx), mark) }
-		@right = arguments + Array.new(15) {|idx| Space.new(color(idx % 2+1))}
+		@left = Array.new(15) {|idx| Space.new(Tape.color(idx))}
+		@current_space = Space.new(Tape.color(1), arguments.shift)
+		arguments = arguments.collect.with_index {|mark, idx| Space.new(Tape.color(idx), mark) }
+		@right = arguments + Array.new(15) {|idx| Space.new(Tape.color(idx % 2+1))}
 		@offset = 0
 	end
 
-	def color(iteration)
+	def self.color(iteration)
 		COLORS.rotate(iteration)[0]
 	end
 
@@ -57,5 +57,5 @@ class Tape
 	end
 
 	private
-	
+
 end
