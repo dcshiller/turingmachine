@@ -1,5 +1,4 @@
 class Space
-
   attr_reader :color, :mark
 
   def initialize(color = :red, mark = :"0")
@@ -8,11 +7,7 @@ class Space
   end
 
   def to_s
-    space_string = []
-    space_string << " ".colorize(background: color)
-    space_string << "#{@mark}".colorize(background: color)
-    space_string << " ".colorize(background: color)
-    space_string
+    " #{@mark} ".colorize(background: color)
   end
 
   def write_mark(new_mark)
