@@ -24,25 +24,28 @@ class ProgramReader
 	end
 
 	def run_program
-		until @finished
-			@display_render
-			current_mark = @tape.get_mark_under_reader
-			next_action = @program_state.get_behavior(current_mark)
-			case next_action
-			when :halt
-				@finished = true
-				break
-			when :right
-				tape.move_right_one_full
-			when :left
-				tape.move_left_one_full
-			when :markx
-				tape.write_mark(:x)
-			when :mark0
-				tape.write_mark(:"0")
+		t1 = Thread.new do
+			until @finished
+				@tape.render
+				current_symbol = @tape.get_symbol_under_reader
+				next_action = @program_state.get_behavior(current_symbol)
+				case next_action
+				when :halt
+					@finished = true
+					break
+				when :right
+					tape.move_right_one_full
+				when :left
+					tape.move_left_one_full
+				when :markx
+					tape.change_mark(:x)
+				when :mark0
+					tape.change_mark(:"0")
+				end
+				@program_state = @program_state.get_next_state(current_symbol)
 			end
-			@program_state = @program_state.get_next_state(current_mark)
 		end
+		t1.join
 	end
 
 end
