@@ -24,10 +24,9 @@ class ProgramReader
 		@counter += 1
 	end
 
-
 	def display_thread
 		Thread.new do
-			loop do
+			until @finished
 				@display.render(@program_state)
 				sleep(0.1)
 				Thread.pass
