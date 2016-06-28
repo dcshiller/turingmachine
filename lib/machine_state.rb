@@ -59,5 +59,4 @@ class MachineState
 	def get_next_state(input)
 		@instruction_hash[input].last
 	end
-
 end
