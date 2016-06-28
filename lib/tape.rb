@@ -6,7 +6,7 @@ class Tape
 	attr_accessor :offset
 	alias  :left_spaces :left
 	alias :right_spaces :right
-	COLORS = [:black, :light_black]
+	COLORS = [:light_white, :light_black]
 
 	def initialize(*arguments)
 		@left = Array.new(15) {|idx| Space.new(Tape.color(idx))}

@@ -2,7 +2,7 @@ module WinOrg
 
   def center(string)
     length = string.uncolorize.length
-    puts " " * ((@cols - length) /2) + string + " " * ((@cols - length) /2)
+    " " * ((@cols - length) /2) + string + " " * ((@cols - length) /2)
   end
 
   def justify(string)

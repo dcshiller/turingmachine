@@ -1,6 +1,16 @@
 
 class MachineState
+  attr_reader :state_array
 	attr_accessor :number, :instruction_hash
+
+  def self.get_downstream_states(state)
+    states = []
+    return states if self.connected?(state1,state2)
+  end
+
+  def self.connected?(state1,state2)
+
+  end
 
 	def initialize(state_number)
 		@number = state_number
@@ -25,6 +35,7 @@ class MachineState
 		fifth = MachineState.new(5)
 		sixth = MachineState.new(6)
 		last = MachineState.halt(7)
+    @state_array += [first,second,third,fourth,fifth,sixth,last]
 		first.set_behavior({:x => [:mark0,second], :"0" => [:right,last]})
 		second.set_behavior({:x => [:right,second], :"0" => [:right,third]})
 		third.set_behavior({:x => [:right,third], :"0" => [:right,fourth]})
