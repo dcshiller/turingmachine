@@ -3,13 +3,16 @@ class MachineState
   attr_reader :state_array
 	attr_accessor :number, :instruction_hash
 
-  def self.get_downstream_states(state)
-    states = []
-    return states if self.connected?(state1,state2)
+  def self.get_downstream_states(state, states = [])
+    connected_states = MachineState.connected(state)
+    return states if connected_states.all? {|state| states.include?(state)}
+    states += connected_states
+    states.uniq!
+    connected_states.each {|state| MachineState.get_downstream_states(state, states)}
   end
 
-  def self.connected?(state1,state2)
-
+  def self.connected(state)
+    [state.instruction_hash[:x][1],state.instruction_hash[:0][1]]
   end
 
 	def initialize(state_number)
