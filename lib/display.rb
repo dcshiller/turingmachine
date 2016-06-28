@@ -1,8 +1,6 @@
 require 'byebug'
 
-
 class Display
-
   attr_reader :tape
 
   def initialize(tape)
