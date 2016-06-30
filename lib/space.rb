@@ -8,7 +8,7 @@ class Space
 
   def to_string_array
     empty_space = " ".colorize(background: color)
-    mark = "#{@mark}".colorize(background: color)
+    mark = "#{@mark}".black.colorize(background: color)
     [empty_space, mark, empty_space]
   end
 

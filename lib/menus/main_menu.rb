@@ -20,7 +20,7 @@ class MainMenu < Menu
 
 
   def initialize
-    super(MAIN_MENU_OPTIONS, MAIN_MENU_EFFECTS)
+    super(MAIN_MENU_OPTIONS, MAIN_MENU_EFFECTS, "Turing Machine Simulator")
   end
 
 end
