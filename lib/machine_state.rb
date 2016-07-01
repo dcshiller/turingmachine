@@ -50,7 +50,11 @@ class MachineState
 		first
 	end
 
-	def to_s
+  def count
+    MachineState.get_downstream_states(self).count
+  end
+
+  def to_s
 		number.to_s + ":   (" + instruction_hash.collect {|key, value| key.to_s + "=>" + value.first.to_s + " " + value.last.number.to_s}.join(", ") + ")"
 	end
 
@@ -73,6 +77,10 @@ class MachineState
 	def get_next_state(input)
 		@instruction_hash[input].last
 	end
+
+  def get_state_information(state_number)
+    MachineState.get_downstream_states(self)[state_number].to_s
+  end
 
   def number_tag
     ones_digits = ["","One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",

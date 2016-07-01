@@ -19,8 +19,13 @@ class Panel
   end
 
   def make_content_fit
+    subtract_rows_to_height
     add_rows_to_reach_height
     content.collect!.with_index {|row,row_number| fill_in_row_to_reach_width(row_number)}
+  end
+
+  def subtract_rows_to_height
+    @content = @content[0...@panel_height]
   end
 
   def add_rows_to_reach_height
@@ -30,6 +35,7 @@ class Panel
   def fill_in_row_to_reach_width(row_number)
     row_content = @content[row_number].join("")
     row_length = row_content.uncolorize.length
+    debugger if @panel_width < row_length
     [row_content + " "*(@panel_width - row_length)]
   end
 
@@ -43,7 +49,7 @@ class Panel
   end
 
   def place_side_by_side(second_panel)
-    merged_content = content.collect.with_index {|line, index| line + second_panel.content[index]}
+    merged_content = content.collect.with_index {|line, index| debugger if second_panel.content[index].nil?; line + second_panel.content[index]}
     Panel.new(width_percentage + second_panel.width_percentage,
               height_percentage,
               merged_content)
