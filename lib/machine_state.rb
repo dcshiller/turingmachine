@@ -82,6 +82,16 @@ class MachineState
     MachineState.get_downstream_states(self)[state_number].to_s
   end
 
+  def get_state_information_hash(state_number)
+    {
+      "state_number" => number_tag,
+      "input_x_behavior" => MachineState.get_downstream_states(self)[state_number].get_behavior(:x).to_s,
+      "input_x_state" => MachineState.get_downstream_states(self)[state_number].get_next_state(:x).number_tag,
+      "input_o_behavior" => MachineState.get_downstream_states(self)[state_number].get_behavior(:"0").to_s,
+      "input_o_state" => MachineState.get_downstream_states(self)[state_number].get_next_state(:"0").number_tag
+    }
+  end
+
   def number_tag
     ones_digits = ["","One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
               "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
