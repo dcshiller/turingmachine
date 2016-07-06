@@ -60,7 +60,7 @@ class MachineState
 
 	def self.halt(state_number)
 		halt_state = MachineState.new(state_number)
-		halt_state.set_behavior(Hash.new([:halt, halt_state]))
+		halt_state.set_behavior(:x =>[:halt, halt_state], :"0" => [:halt, halt_state])
 		halt_state
 	end
 
@@ -82,13 +82,13 @@ class MachineState
     MachineState.get_downstream_states(self)[state_number].to_s
   end
 
-  def get_state_information_hash(state_number)
+  def get_state_information_hash
     {
       "state_number" => number_tag,
-      "input_x_behavior" => MachineState.get_downstream_states(self)[state_number].get_behavior(:x).to_s,
-      "input_x_state" => MachineState.get_downstream_states(self)[state_number].get_next_state(:x).number_tag,
-      "input_o_behavior" => MachineState.get_downstream_states(self)[state_number].get_behavior(:"0").to_s,
-      "input_o_state" => MachineState.get_downstream_states(self)[state_number].get_next_state(:"0").number_tag
+      "input_x_behavior" => get_behavior(:x).to_s,
+      "input_x_state" => get_next_state(:x).number_tag,
+      "input_o_behavior" => get_behavior(:"0").to_s,
+      "input_o_state" => get_next_state(:"0").number_tag
     }
   end
 
