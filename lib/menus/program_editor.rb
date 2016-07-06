@@ -12,43 +12,43 @@ class ProgramEditor
   def initialize(program = MachineState.make_adder)
     refresh_window_information
     @program = program
+    @program_states = MachineState.get_downstream_states(@program)
+    get_program_state_names
 
-    @lselection = -1
-    @rselection = 0
+    @lselection, @rselection = 0, 0
     @focus = [:left,:right]
-    @program_state_names = get_program_state_names(@program)
 
-    @state_number = [""]
-    # @state_if_x_do_y, @state_if_x_then_go_to = "", ""
-    # @state_if_x = [@state_if_x_do_y, @state_if_x_then_go_to]
-    @state_if_x = ["", ""]
-    # @state_if_o_do_y, @state_if_o_then_go_to = "", ""
-    # @state_if_o = [@state_if_o_do_y, @state_if_o_then_go_to]
-    @state_if_o = ["", ""]
+    @state_number, @state_if_x, @state_if_o = [""], ["", ""], ["", ""]
     @program_state_data = [@state_number,@state_if_x,@state_if_o]
     selection_loop
   end
 
   def left_panel_content
-    @program_state_names + [[[""]],[["new".black]]]
+    num_rows = @rows * 0.8
+    if @lselection >= num_rows -1
+      return @program_state_names[(@lselection-num_rows+2)..@lselection+1]
+    else
+      @program_state_names
+    end
   end
 
   def right_panel_content
-      state_info = @program.get_state_information_hash(@lselection)
-      text_colors = focus_left? ? Array.new(4,:black) : [:red, :black, :black, :black].rotate(-1*@rselection)
-      @state_number[0] = (state_info["state_number"] || " ").black
-      @state_if_x[0] = ("Do " + state_info["input_x_behavior"] || " ").colorize(text_colors[0])
-      @state_if_x[1] = (" and go to " + state_info["input_x_state"] || " ").colorize(text_colors[1])
-      @state_if_o[0] = ("Do " + state_info["input_o_behavior"] || " ").colorize(text_colors[2])
-      @state_if_o[1] = (" and go to " + state_info["input_o_state"] || " ").colorize(text_colors[3])
-      @program_state_data
+    return [[""], ["", ""], ["", ""]] if @program_states[@lselection] == nil
+    state_info = @program_states[@lselection].get_state_information_hash
+    text_colors = focus_left? ? Array.new(4,:black) : [:red, :black, :black, :black].rotate(-1*@rselection)
+    @state_number[0] = (state_info["state_number"] || " ").black
+    @state_if_x[0] = ("Do " + state_info["input_x_behavior"] || " ").colorize(text_colors[0])
+    @state_if_x[1] = (" and go to " + state_info["input_x_state"] || " ").colorize(text_colors[1])
+    @state_if_o[0] = ("Do " + state_info["input_o_behavior"] || " ").colorize(text_colors[2])
+    @state_if_o[1] = (" and go to " + state_info["input_o_state"] || " ").colorize(text_colors[3])
+    @program_state_data
   end
 
   def make_and_combine_panels
     top_panel = Panel.new(1, 0.1,[[],[center("Program Editing Menu")]], :light_black)
 
-    state_list_panel = Panel.new(0.7, 0.8, left_panel_content, :white)
-    state_innards_panel = Panel.new(0.3, 0.8, right_panel_content, :light_white)
+    state_list_panel = Panel.new(0.5, 0.8, left_panel_content, :white)
+    state_innards_panel = Panel.new(0.5, 0.8, right_panel_content, :light_white)
 
     bottom_panel = Panel.new(1, 0.1, [[""]], :light_black)
 
@@ -72,8 +72,12 @@ class ProgramEditor
     @focus.first == :left
   end
 
-  def get_program_state_names(program)
-    MachineState.get_downstream_states(program).collect {|program_state| [program_state.number_tag.black]}
+  def focus_right?
+    !focus_left?
+  end
+
+  def get_program_state_names
+    @program_state_names = @program_states.collect {|program_state| [program_state.number_tag.black]}  + [["--> new".black]]
   end
 
   def selection_loop
@@ -84,33 +88,46 @@ class ProgramEditor
        window.draw_content
       case get_keystroke
       when "\r", "\n"
+        if @lselection == @program_state_names.count - 1
+          new_state = MachineState.new(@lselection+1)
+          new_state.set_behavior(:x => [:halt, new_state], :"0" => [:halt, new_state])
+          @program_states << new_state
+          get_program_state_names
+        end
+        @rselection = 0
         @focus.rotate![1]
       when " "
-        behaviors = [:markx, :mark0, :right, :left]
-        program = MachineState.get_downstream_states(@program).select {|program| program.number_tag == @program_state_names[@lselection][0].uncolorize}.first
-        input = :x if @rselection < 3
-        input = :"0" if @rselection > 2
-        go_to_state = program.get_next_state(input)
-        current_behavior_number = behaviors.find_index(program.get_behavior(input))
-        new_behavior_number = @rselection.even? ? ((current_behavior_number + 1) % 4) : current_behavior_number
-        states = MachineState.get_downstream_states(@program)
-        current_state_number = states.find_index(go_to_state)
-        go_to_state = states[current_state_number+1] if @rselection.odd?
-        # debugger
-        program.set_behavior(input => [behaviors[new_behavior_number], go_to_state])
+        if focus_right?
+          behaviors = [:markx, :mark0, :right, :left, :halt]
+          program = @program_states[@lselection]#.select {|program| program.number_tag == @program_state_names[@lselection][0].uncolorize}.first
+          input = (@rselection % 4 <= 1) ? :x : :"0"
+          go_to_state = program.get_next_state(input)
+
+          current_behavior_number = behaviors.find_index(program.get_behavior(input))
+
+          new_behavior_number = @rselection.even? ? ((current_behavior_number + 1) % 5) : current_behavior_number
+
+          current_state_number = @program_states.find_index(go_to_state)
+          if @rselection.odd? && current_state_number <= @program_states.count-2
+            go_to_state = @program_states[current_state_number + 1]
+          elsif @rselection.odd?
+            go_to_state = @program_states[0]
+          end
+          program.set_behavior(input => [behaviors[new_behavior_number], go_to_state])
+        end
       when "\e[D"
         @rselection -= 1 unless @rselection.even?
       when "\e[C"
         @rselection += 1 unless @rselection.odd?
       when "\e[A"
         if focus_left?
-          @lselection -= 1 unless @lselection < 0
+          @lselection -= 1 unless @lselection <= 0
         else
           @rselection += 2
         end
       when "\e[B"
         if focus_left?
-          @lselection += 1 unless @lselection >= (@program.count + 1)
+          @lselection += 1 unless @lselection >= (@program_states.count)
         else
           @rselection -= 2
         end
