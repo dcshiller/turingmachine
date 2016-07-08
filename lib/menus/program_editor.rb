@@ -1,4 +1,4 @@
-
+require 'yaml'
 require_relative 'window_organization'
 require_relative '../machine_state'
 require_relative '../key_input'
@@ -45,12 +45,22 @@ class ProgramEditor
   end
 
   def make_and_combine_panels
-    top_panel = Panel.new(1, 0.1,[[],[center("Program Editing Menu")]], :light_black)
+    top_panel = Panel.new(1, 0.1,[[]], "Program Editing Menu", :light_black)
 
-    state_list_panel = Panel.new(0.5, 0.8, left_panel_content, :white)
-    state_innards_panel = Panel.new(0.5, 0.8, right_panel_content, :light_white)
+    state_list_panel = Panel.new(0.5, 0.8,
+                                left_panel_content,
+                                "State Names".black,
+                                :white)
 
-    bottom_panel = Panel.new(1, 0.1, [[""]], :light_black)
+    state_innards_panel = Panel.new(0.5, 0.8,
+                                    right_panel_content[1..-1],
+                                    right_panel_content[0][0],
+                                    :light_white)
+
+    bottom_panel = Panel.new(1, 0.1,
+                            [[center("'s': save, 'l': load,  'enter': switch focus, 'spacebar': change setting")],[center("'new/enter': make a new state, 'm': return to menut")], ],
+                            "",
+                            :light_black)
 
     middle_panels = state_list_panel.place_side_by_side(state_innards_panel)
     top_and_middle_panels = top_panel.place_on_top_of(middle_panels)
@@ -80,11 +90,29 @@ class ProgramEditor
     @program_state_names = @program_states.collect {|program_state| [program_state.number_tag.black]}  + [["--> new".black]]
   end
 
+  def save
+    yaml_program_states = YAML.dump(@program_states)
+    file_name = full_screen_gets("File name:").chomp + ".tm"
+    File.open(file_name, "w") do |file|
+      file.write(yaml_program_states)
+    end
+    sleep(3)
+  end
+
+  def load
+    file_name = full_screen_gets("File name:").chomp + ".tm"
+    yaml_program_states = File.read(file_name)
+    @program_states = YAML.load(yaml_program_states)
+    get_program_state_names
+  end
+
   def selection_loop
     loop do
        color_selection
        window = make_and_combine_panels
-       system("clear")
+       system("echo -e \033c")
+       system("setterm -cursor off")
+# system("tput reset") # \printf "\ec"
        window.draw_content
       case get_keystroke
       when "\r", "\n"
@@ -115,6 +143,12 @@ class ProgramEditor
           end
           program.set_behavior(input => [behaviors[new_behavior_number], go_to_state])
         end
+      when "s"
+        save
+      when "l"
+        load
+      when "m"
+        break
       when "\e[D"
         @rselection -= 1 unless @rselection.even?
       when "\e[C"
@@ -131,13 +165,9 @@ class ProgramEditor
         else
           @rselection -= 2
         end
-      when "b"
-        break
       else
       end
     end
   end
 
 end
-
-ProgramEditor.new
