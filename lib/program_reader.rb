@@ -12,10 +12,7 @@ class ProgramReader
 		@counter = 0
 		@tape = Tape.new(:x,:x,:x,:"0",:x,:x)
 		@display = Display.new(@tape)
-		#first_state = MachineState.halt(0)
-		first_state = MachineState.make_adder
-		#first_state = MachineState.make_adder
-		@program_state = first_state
+		@program_state = $program
 		@finished = false
 		at_exit {system("clear")}
 	end

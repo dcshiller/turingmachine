@@ -1,5 +1,4 @@
 # require 'colorize'
-
 module WinOrg
 
   def center(string)
@@ -8,9 +7,12 @@ module WinOrg
     " " * ((max_width - length) /2) + string + " " * ((max_width - length) /2)
   end
 
-  def justify(string)
+  def justify(string, offset = 10)
     length = string.uncolorize.length
-    puts (" " * (@cols/3)) + string + (" " * (2*(@cols)/3-length + (1)))
+    debugger if offset.is_a?(String)
+    before_length = ((@cols/2) - offset)
+    before_space = " " * before_length
+    puts (before_space + string )# + (" " * (2*(@cols)/-10-length + (1)))
   end
 
   def refresh_window_information
@@ -18,13 +20,20 @@ module WinOrg
     [@cols, @rows]
   end
 
-
   def full_screen_gets(query)
     refresh_window_information
     system("\printf '\ec' ")
     puts "\n" * ((@rows / 2) - 2)
-    print " " * ((@cols - 10) /2) + query + ": "
+    print " " * ((@cols - 10) /2) + query + " "
     gets
+  end
+
+  def flash(notice)
+    refresh_window_information
+    system("\printf '\ec' ")
+    puts "\n" * ((@rows / 2) - 2)
+    print " " * ((@cols - 10) /2) + notice + " "
+    sleep(1)
   end
 
 end

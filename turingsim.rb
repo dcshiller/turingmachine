@@ -5,15 +5,16 @@ require_relative 'lib/program_reader'
 require_relative 'lib/menus/main_menu'
 require_relative 'lib/menus/splash'
 require_relative 'lib/tape'
-require_relative 'lib/menus/full_screen_gets'
 
 class TuringSim
   include WinOrg, KeyInput #Splash,
 
   def initialize
+    $program = MachineState.make_adder
     set_terminal_settings and at_exit { reset_terminal_settings and system("clear") }
     splash
     MainMenu.instance
+    system("setterm -cursor on")
   end
 
   private

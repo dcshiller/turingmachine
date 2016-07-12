@@ -23,7 +23,7 @@ class Menu
       when "\e[B"
         @selection += 1 unless @selection >= options.length - 1
       when "\r", "\n"
-        effects[selection].call
+        self.instance_eval effects[selection]
       when "b"
         break
       else
@@ -34,10 +34,15 @@ class Menu
   def print_menu_options
     refresh_window_information
     system("clear")
+    offset = @options.sort {|option, option2| option.uncolorize.length <=> option2.uncolorize.length}.last.length
     puts "\n" * ((@rows / 2) - 7)
     puts center("#{@menu_title}\n\n")
     @options.each_with_index do |option, idx|
-     if idx == @selection then justify selected option else justify option end
+     if idx == @selection
+        justify(selected(option), offset/2)
+     else
+       justify option, offset/2
+     end
     end
   end
 
