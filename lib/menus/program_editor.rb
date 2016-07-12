@@ -10,10 +10,12 @@ class ProgramEditor
     include WinOrg, KeyInput
 
   def initialize(program = MachineState.make_adder)
+    # system("stty -echo"
     refresh_window_information
     @program = program
     @program_states = MachineState.get_downstream_states(@program)
     get_program_state_names
+
 
     @lselection, @rselection = 0, 0
     @focus = [:left,:right]
@@ -110,10 +112,12 @@ class ProgramEditor
     loop do
        color_selection
        window = make_and_combine_panels
-       system("echo -e \033c")
+       #system("echo -e \033c")
+       system("clear")
        system("setterm -cursor off")
-# system("tput reset") # \printf "\ec"
+       # system("tput reset") # \printf "\ec"
        window.draw_content
+       STDIN.echo = false
       case get_keystroke
       when "\r", "\n"
         if @lselection == @program_state_names.count - 1
