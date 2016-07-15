@@ -14,9 +14,14 @@ class Panel
     @panel_height = @rows * height_percentage
     @title = title ? center(title) : nil
     @content = title ? [[title]] + content : content
+    pad_content
     @background_color = background_color
     make_content_fit
     colorize_content
+  end
+
+  def pad_content
+    @content.collect!.with_index {|el,idx| el = [" "] + el if idx > 0 }
   end
 
   def center_title
