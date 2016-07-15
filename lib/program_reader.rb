@@ -9,7 +9,6 @@ class ProgramReader
 
 	def initialize
 		@pause = false
-		@counter = 0
 		@tape = Tape.new(:x,:x,:x,:"0",:x,:x)
 		@display = Display.new(@tape)
 		@program_state = $program
@@ -17,15 +16,13 @@ class ProgramReader
 		at_exit {system("clear")}
 	end
 
-	def counter
-		@counter += 1
-	end
-
 	def display_thread
 		Thread.new do
 			until @finished
-				@display.render(@program_state)
+        @display.refresh_program_state(@program_state)
+				@display.render_panels
 				sleep(0.1)
+        # puts 'c'
 				Thread.pass
 			end
 		end
@@ -42,7 +39,6 @@ class ProgramReader
 					break
 				when :right
 					move_right
-					#tape.move_right_one_full
 				when :left
 					move_left
 				when :markx

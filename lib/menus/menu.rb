@@ -31,17 +31,24 @@ class Menu
     end
   end
 
+  def max_length(array)
+    sorted_array = array.sort do |option, option2|
+      option.uncolorize.length <=> option2.uncolorize.length
+    end
+    sorted_array.last.length
+  end
+
   def print_menu_options
     refresh_window_information
-    system("clear")
-    offset = @options.sort {|option, option2| option.uncolorize.length <=> option2.uncolorize.length}.last.length
+    full_clear#work for linux?
+    offset = max_length(@options)/2
     puts "\n" * ((@rows / 2) - 7)
     puts center("#{@menu_title}\n\n")
     @options.each_with_index do |option, idx|
      if idx == @selection
-        justify(selected(option), offset/2)
+        justify(selected(option), offset)
      else
-       justify option, offset/2
+       justify option, offset
      end
     end
   end

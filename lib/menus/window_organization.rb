@@ -7,6 +7,26 @@ module WinOrg
     " " * ((max_width - length) /2) + string + " " * ((max_width - length) /2)
   end
 
+  def flash(notice)
+    refresh_window_information
+    system("\printf '\ec' ")
+    puts "\n" * ((@rows / 2) - 2)
+    print " " * ((@cols - 10) /2) + notice + " "
+    sleep(1)
+  end
+
+  def full_clear
+    system("printf '\33c\e[3J'")
+  end
+
+  def full_screen_gets(query)
+    refresh_window_information
+    system("\printf '\ec' ")
+    puts "\n" * ((@rows / 2) - 2)
+    print " " * ((@cols - 10) /2) + query + " "
+    gets
+  end
+
   def justify(string, offset = 10)
     length = string.uncolorize.length
     debugger if offset.is_a?(String)
@@ -20,20 +40,5 @@ module WinOrg
     [@cols, @rows]
   end
 
-  def full_screen_gets(query)
-    refresh_window_information
-    system("\printf '\ec' ")
-    puts "\n" * ((@rows / 2) - 2)
-    print " " * ((@cols - 10) /2) + query + " "
-    gets
-  end
-
-  def flash(notice)
-    refresh_window_information
-    system("\printf '\ec' ")
-    puts "\n" * ((@rows / 2) - 2)
-    print " " * ((@cols - 10) /2) + notice + " "
-    sleep(1)
-  end
 
 end
