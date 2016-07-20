@@ -28,36 +28,20 @@ class ProgramReader
 	end
 
   def log_write(string)
-    @log << "#{@program_state.number_tag}: #{string}
-            and go to
-            #{@program_state.get_next_state(@tape.get_mark_under_reader).number_tag}"
+    @log << "#{@program_state.number_tag}: #{string}" +
+            " and go to" +
+            " #{@program_state.get_next_state(@tape.get_mark_under_reader).number_tag}"
   end
 
-	def move_right
-    log_write("Move right")
-		tape.offset_right
-		sleep(0.2)
-		Thread.pass
-		tape.offset_right
-		sleep(0.2)
-		Thread.pass
-		tape.offset_right
-		sleep(0.5)
-		Thread.pass
+	def move(direction)
+    log_write("Move #{direction}")
+    3.times do |idx|
+      direction == :right ? tape.offset_right : tape.offset_left
+  		sleep(0.2)
+      sleep(0.3) if idx == 2
+  		Thread.pass
+    end
 	end
-
-  def move_left
-    log_write("Move left")
-    tape.offset_left
-    sleep(0.2)
-    Thread.pass
-    tape.offset_left
-    sleep(0.2)
-    Thread.pass
-    tape.offset_left
-    sleep(0.5)
-    Thread.pass
-  end
 
 	def program_thread
 		Thread.new do
@@ -68,10 +52,8 @@ class ProgramReader
 				when :halt
 					@finished = true
 					break
-				when :right
-					move_right
-				when :left
-					move_left
+				when :right, :left
+					move(next_action)
 				when :markx
 					write_mark(:x)
 				when :mark0
