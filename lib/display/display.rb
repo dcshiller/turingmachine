@@ -4,9 +4,10 @@ class Display
   include WinOrg
   attr_reader :tape
 
-  def initialize(tape)
+  def initialize(tape, log)
     @tape = tape
     @tape_length = 10
+    @log = log
   end
 
   def refresh_program_state(program_state)
@@ -44,6 +45,13 @@ class Display
     [(" " * ((tape_length*3)/2+adjustment) + arrow.encode("utf-8")).split("")]
   end
 
+
+  def make_log_panel_content(height)
+    log_content = @log.map.with_index {|el, idx| idx.to_s + " " + el}
+    log_content.shift until log_content.length < height
+    log_content.map {|el| [[el]]}
+  end
+
   def make_tape_panel_content
     tape_panel_content = []
     1.times {tape_panel_content << [[""]]}
@@ -68,17 +76,27 @@ class Display
 
   def make_and_combine_panels
     refresh_window_information and refresh_tape_length
-    tape_panel = Panel.new(0.47,0.5,
+    tape_panel = Panel.new(0.47,0.8,
                           make_tape_panel_content,
                           title: "Tape Display",
                           padded: true)
 
-    margin = Panel.new(0.03,0.5,[[]], background_color: :light_black)
+    margin = Panel.new(0.03,0.8,[[]], background_color: :light_black)
+
     tape_panel = margin.place_side_by_side(tape_panel)
-    info_panel = Panel.new(0.47,0.5,
+
+    state_info_panel = Panel.new(0.47,0.5,
                           make_info_panel_content,
                           title: "State Information",
                           padded: true)
+
+    log_panel = Panel.new(0.47,0.3,
+                          make_log_panel_content(0.3*@rows),
+                          title: "Log",
+                          padded: true)
+
+    info_panel = state_info_panel.place_on_top_of(log_panel)
+
     info_panel = info_panel.place_side_by_side(margin)
     central_panel = tape_panel.place_side_by_side(info_panel)
 
