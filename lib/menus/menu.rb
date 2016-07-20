@@ -1,5 +1,5 @@
-require_relative 'window_organization'
-require_relative '../key_input'
+# require_relative 'window_organization'
+require_relative '../fundamentals/key_input'
 require 'singleton'
 
 class Menu
@@ -23,7 +23,8 @@ class Menu
       when "\e[B"
         @selection += 1 unless @selection >= options.length - 1
       when "\r", "\n"
-        self.instance_eval effects[selection]
+        self.instance_eval effects[selection] if effects[selection].is_a?(String)
+        self.instance_eval &effects[selection] if effects[selection].is_a?(Proc)
       when "b"
         break
       else

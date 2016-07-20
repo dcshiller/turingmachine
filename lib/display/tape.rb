@@ -9,10 +9,11 @@ class Tape
 	COLORS = [:light_white, :light_black]
 
 	def initialize(*arguments)
-		@left = Array.new(15) {|idx| Space.new(Tape.color(idx))}
+		@length = 40
+		@left = Array.new(@length) {|idx| Space.new(Tape.color(idx))}
 		@current_space = Space.new(Tape.color(1), arguments.shift)
-		arguments = arguments.collect.with_index {|mark, idx| Space.new(Tape.color(idx), mark) }
-		@right = arguments + Array.new(15) {|idx| Space.new(Tape.color(idx % 2+1))}
+		arguments.collect!.with_index {|mark, idx| Space.new(Tape.color(idx), mark)}
+		@right = arguments + Array.new(@length) {|idx| Space.new(Tape.color(idx % 2+1))}
 		@offset = 0
 	end
 

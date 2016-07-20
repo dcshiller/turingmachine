@@ -1,7 +1,0 @@
----
-greeting:
-  hello: world
-people:
-- !ruby/struct:Person
-  first_name: Bob
-  last_name: Smith

@@ -74,6 +74,21 @@ class MachineState
 		@instruction_hash[input].first
 	end
 
+  def get_behavior_as_string(input)
+    case get_behavior(input)
+    when :mark0
+      "write a 0"
+    when :markx
+      "write a x"
+    when :right
+      "move to the right"
+    when :left
+      "move to the left"
+    when :halt
+      "halt"
+    end
+  end
+
 	def get_next_state(input)
 		@instruction_hash[input].last
 	end

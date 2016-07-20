@@ -1,7 +1,8 @@
 require 'yaml'
-require_relative 'window_organization'
-require_relative '../machine_state'
-require_relative '../key_input'
+require_relative '../fundamentals/window_organization'
+require_relative '../fundamentals/array_colors'
+require_relative '../machinelogic/machine_state'
+require_relative '../fundamentals/key_input'
 require 'colorize'
 require 'io/console'
 require_relative 'panels'
@@ -47,22 +48,31 @@ class ProgramEditor
   end
 
   def make_and_combine_panels
-    top_panel = Panel.new(1, 0.1,[[]], "Program Editing Menu", :light_black)
+    top_panel = Panel.new(1, 0.1,[[]],
+                                title: "Program Editing Menu",
+                                background_color: :light_black,)
 
-    state_list_panel = Panel.new(0.5, 0.8,
-                                left_panel_content,
-                                "State Names".black,
-                                :white)
+    margin = Panel.new(0.1,0.8,[[]], background_color: :light_black)
 
-    state_innards_panel = Panel.new(0.5, 0.8,
-                                    right_panel_content[1..-1],
-                                    right_panel_content[0][0],
-                                    :light_white)
+    state_list_panel = Panel.new(0.4, 0.8, left_panel_content,
+                                title: "State Names".black,
+                                background_color: :white,
+                                padded: true)
+
+    state_list_panel = margin.place_side_by_side(state_list_panel)
+
+    state_innards_panel = Panel.new(0.4, 0.8,
+                                right_panel_content[1..-1],
+                                title: right_panel_content[0][0],
+                                background_color: :light_white,
+                                padded: true)
+
+    state_innards_panel = state_innards_panel.place_side_by_side(margin)
 
     bottom_panel = Panel.new(1, 0.1,
-                            [[center("'s': save, 'l': load,  'enter': switch focus, 'spacebar': change setting")],[center("'new/enter': make a new state, 'm': return to menut")], ],
-                            "",
-                            :light_black)
+                                [ [center("'s': save, 'l': load,  'enter': switch focus, 'spacebar': change setting")],
+                                  [center("'new/enter': make a new state, 'm': return to menut")], ],
+                                background_color: :light_black)
 
     middle_panels = state_list_panel.place_side_by_side(state_innards_panel)
     top_and_middle_panels = top_panel.place_on_top_of(middle_panels)
@@ -89,7 +99,7 @@ class ProgramEditor
   end
 
   def get_program_state_names
-    @program_state_names = @program_states.collect {|program_state| [program_state.number_tag.black]}  + [["--> new".black]]
+    @program_state_names = @program_states.collect {|program_state| [program_state.number_tag].black}  + [["--> new".black]]
   end
 
   def save
@@ -113,7 +123,7 @@ class ProgramEditor
        color_selection
        window = make_and_combine_panels
        #system("echo -e \033c")
-       system("clear")
+       full_clear
        system("setterm -cursor off")
        # system("tput reset") # \printf "\ec"
        window.draw_content
