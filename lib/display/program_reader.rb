@@ -21,7 +21,7 @@ class ProgramReader
 			until @finished
 				@display.refresh_program_state(@program_state)
 				@display.render_panels
-				sleep(0.1)
+				# sleep(0.1)
 				Thread.pass
 			end
 		end
@@ -51,13 +51,11 @@ class ProgramReader
 				case next_action
 				when :halt
 					@finished = true
-					break
+					# break
 				when :right, :left
 					move(next_action)
-				when :markx
-					write_mark(:x)
-				when :mark0
-					write_mark(:"0")
+				when :markx, :mark0
+					write_mark(next_action.to_s[-1].to_sym)
 				end
 				@program_state = @program_state.get_next_state(current_mark)
 			end
