@@ -1,12 +1,13 @@
-require_relative 'window_organization'
-require_relative '../key_input'
+require_relative '../fundamentals/window_organization'
+require_relative '../fundamentals/key_input'
 
 #module Splash
 #   include WinOrg, KeyInput
 
   def splash
     refresh_window_information
-    system("clear")
+    # system("clear")
+    full_clear #
     puts "\n" * ((@rows / 2) - 2)
     title = "Turing Machine Simulator".split("")
     title = title.collect.with_index {|mark, idx| Space.new(Tape.color(idx), mark) }

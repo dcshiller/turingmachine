@@ -1,4 +1,4 @@
-require_relative 'window_organization'
+# require_relative 'window_organization'
 require 'colorize'
 require 'byebug'
 
@@ -6,29 +6,26 @@ class Panel
   include WinOrg
   attr_reader :cols, :rows, :panel_width, :panel_height, :content, :width_percentage, :height_percentage
 
-  def initialize(width_percentage, height_percentage, content, title = nil, background_color = nil)
+  def initialize(width_percentage, height_percentage, content, options = {}) #Options: title = nil, background_color = nil, padded = false)
     refresh_window_information
-    @width_percentage = width_percentage
-    @height_percentage = height_percentage
-    @panel_width = @cols * width_percentage
-    @panel_height = @rows * height_percentage
-    @title = title ? center(title) : nil
-    @content = title ? [[title]] + content : content
-    pad_content
-    @background_color = background_color
+    @width_percentage,@height_percentage = width_percentage, height_percentage
+    @panel_width, @panel_height = @cols * width_percentage, @rows * height_percentage
+    @content = content.dup
+    pad_content if options[:padded]
+    @content.unshift([center(options[:title])]) if options[:title]
+    @background_color = options[:background_color] if options[:background_color]
     make_content_fit
     colorize_content
   end
 
   def pad_content
-    @content.collect!.with_index {|el,idx| el = [" "] + el if idx > 0 }
+    @content.collect!.with_index {|el,idx| [[" "] + el] }
   end
-
-  def center_title
-    return unless @title
-    row_content = @content[0].join("")
-    @content[0] = [center(row_content)]
-  end
+  #
+  # def center_title
+  #   row_content = @content[0].join("")
+  #   @content[0] = [center(row_content)]
+  # end
 
   def make_content_fit
     subtract_rows_to_height
@@ -45,11 +42,10 @@ class Panel
   end
 
   def fill_in_row_to_reach_width(row_number)
-    center_title
     row_content = @content[row_number].join("")
     row_length = row_content.uncolorize.length
     # debugger if @panel_width <= row_length + 1
-    [row_content + " "*([@panel_width - row_length-1,0].max)]
+    [row_content + " "*([@panel_width - row_length,0].max)]
   end
 
   def colorize_content
@@ -57,12 +53,25 @@ class Panel
   end
 
   def draw_content
-    system("clear")
-    content.each {|line| puts line.join("")}
+    full_clear
+    content.each do |line|
+       puts line.join("")
+    end
+  end
+
+  def padded?
+    @padded
   end
 
   def place_side_by_side(second_panel)
-    merged_content = content.collect.with_index {|line, index| debugger if second_panel.content[index].nil?; line + second_panel.content[index]}
+    if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
+       @cols * (self.width_percentage + second_panel.width_percentage)
+       extra_space = [[" "]]
+     else
+       extra_space = [[]]
+     end
+
+    merged_content = content.collect.with_index {|line, index| line + extra_space + second_panel.content[index]}
     Panel.new(
               width_percentage + second_panel.width_percentage,
               height_percentage,

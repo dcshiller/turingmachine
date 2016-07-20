@@ -1,17 +1,17 @@
 require 'io/console'
 require 'colorize'
 require 'byebug'
-require_relative 'lib/program_reader'
+require_relative 'lib/display/program_reader'
 require_relative 'lib/menus/main_menu'
 require_relative 'lib/menus/splash'
-require_relative 'lib/tape'
+# require_relative 'lib/display/tape'
 
 class TuringSim
   include WinOrg, KeyInput #Splash,
 
   def initialize
     $program = MachineState.make_adder
-    set_terminal_settings and at_exit { reset_terminal_settings and system("clear") }
+    set_terminal_settings and at_exit { system("clear"); reset_terminal_settings }
     splash
     MainMenu.instance
     system("setterm -cursor on")

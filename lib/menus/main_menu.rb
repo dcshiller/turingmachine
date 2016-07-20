@@ -1,4 +1,4 @@
-require_relative 'window_organization'
+require_relative '../fundamentals/window_organization'
 require_relative 'menu'
 require_relative 'program_editor'
 
@@ -16,18 +16,21 @@ class MainMenu < Menu
   MAIN_MENU_EFFECTS = [ nil,
     " ProgramReader.new.run_program",
     " ProgramEditor.new",
-    "
+    Proc.new {
       begin
-        file_name = './programs/' + send(:full_screen_gets, 'File name:').chomp + '.tm'
-        yaml_program_states = File.read(file_name)
-        @program_states = YAML.load(yaml_program_states)
+        response = full_screen_gets('File name:').chomp
+        unless response == 'back'
+          file_name = './programs/' + response + '.tm'
+          yaml_program_states = File.read(file_name)
+          @program_states = YAML.load(yaml_program_states)
+        end
       rescue
-        flash('file not found')
+        flash("file not found \n" + center("('back'returns to menu)"))
         retry
       end
-    ",
+    },
     " nil",
-    " system('\printf \ec') and break"
+    " full_clear and break"
   ]
 
   def initialize

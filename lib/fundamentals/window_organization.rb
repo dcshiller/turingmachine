@@ -9,19 +9,22 @@ module WinOrg
 
   def flash(notice)
     refresh_window_information
-    system("\printf '\ec' ")
+    full_clear
+    # system("\printf '\ec' ")
     puts "\n" * ((@rows / 2) - 2)
     print " " * ((@cols - 10) /2) + notice + " "
     sleep(1)
   end
 
   def full_clear
-    system("printf '\33c\e[3J'")
+    # system("printf '\33c\e[3J'")
+    # system("\printf '\ec' ")
+    system("clear")
   end
 
   def full_screen_gets(query)
     refresh_window_information
-    system("\printf '\ec' ")
+    full_clear
     puts "\n" * ((@rows / 2) - 2)
     print " " * ((@cols - 10) /2) + query + " "
     gets

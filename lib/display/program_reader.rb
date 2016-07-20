@@ -1,8 +1,7 @@
-require_relative 'machine_state'
+require_relative '../machinelogic/machine_state'
 require_relative 'tape'
 require_relative 'display'
 require 'byebug'
-
 
 class ProgramReader
 	attr_reader :tape
@@ -13,16 +12,15 @@ class ProgramReader
 		@display = Display.new(@tape)
 		@program_state = $program
 		@finished = false
-		at_exit {system("clear")}
+		at_exit {full_clear}
 	end
 
 	def display_thread
 		Thread.new do
 			until @finished
-        @display.refresh_program_state(@program_state)
+				@display.refresh_program_state(@program_state)
 				@display.render_panels
 				sleep(0.1)
-        # puts 'c'
 				Thread.pass
 			end
 		end
