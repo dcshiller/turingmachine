@@ -9,7 +9,8 @@ class ProgramReader
 	def initialize
 		@pause = false
 		@tape = Tape.new(:x,:x,:x,:"0",:x,:x)
-		@display = Display.new(@tape)
+    @log = []
+		@display = Display.new(@tape, @log)
 		@program_state = $program
 		@finished = false
 		at_exit {full_clear}
@@ -25,6 +26,38 @@ class ProgramReader
 			end
 		end
 	end
+
+  def log_write(string)
+    @log << "#{@program_state.number_tag}: #{string}
+            and go to
+            #{@program_state.get_next_state(@tape.get_mark_under_reader).number_tag}"
+  end
+
+	def move_right
+    log_write("Move right")
+		tape.offset_right
+		sleep(0.2)
+		Thread.pass
+		tape.offset_right
+		sleep(0.2)
+		Thread.pass
+		tape.offset_right
+		sleep(0.5)
+		Thread.pass
+	end
+
+  def move_left
+    log_write("Move left")
+    tape.offset_left
+    sleep(0.2)
+    Thread.pass
+    tape.offset_left
+    sleep(0.2)
+    Thread.pass
+    tape.offset_left
+    sleep(0.5)
+    Thread.pass
+  end
 
 	def program_thread
 		Thread.new do
@@ -49,40 +82,17 @@ class ProgramReader
 		end
 	end
 
+  def run_program
+    display = display_thread
+    program_thread.join
+    display_thread.join
+  end
+
 	def write_mark(mark)
+    log_write("Write #{mark}")
 		sleep(0.5)
 		tape.write_mark(mark)
 		sleep(0.5)
-	end
-
-	def run_program
-		display = display_thread
-		program_thread.join
-		display_thread.join
-	end
-
-	def move_right
-		tape.offset_right
-		sleep(0.2)
-		Thread.pass
-		tape.offset_right
-		sleep(0.2)
-		Thread.pass
-		tape.offset_right
-		sleep(0.5)
-		Thread.pass
-	end
-
-	def move_left
-		tape.offset_left
-		sleep(0.2)
-		Thread.pass
-		tape.offset_left
-		sleep(0.2)
-		Thread.pass
-		tape.offset_left
-		sleep(0.5)
-		Thread.pass
 	end
 
 end
