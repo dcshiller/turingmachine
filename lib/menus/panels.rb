@@ -64,6 +64,7 @@ class Panel
   end
 
   def place_side_by_side(second_panel)
+    raise "Heights don't align" if self.height_percentage != second_panel.height_percentage
     if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
        @cols * (self.width_percentage + second_panel.width_percentage)
        extra_space = [[" "]]
@@ -80,6 +81,7 @@ class Panel
   end
 
   def place_on_top_of(second_panel)
+    raise "Widths don't align" if self.width_percentage != second_panel.width_percentage
     Panel.new(
               width_percentage,
               height_percentage + second_panel.height_percentage,

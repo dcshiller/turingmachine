@@ -25,37 +25,38 @@ class Tape
 		current_space.write_mark(new_mark)
 	end
 
-	def offset_right
-		@offset += 1
-		if @offset > 2
+	def offset_to(direction)
+		@offset += (direction == :right ? 1 : -1)
+		if @offset > 2 || @offset < -2
 			@offset = 0
-			move_right_one_full
+			move_one_full(direction)
 		end
 	end
-
-	def offset_left
-		@offset -= 1
-		if @offset < -2
-			@offset = 0
-			move_left_one_full
-		end
-	end
+	#
+	# def offset_left
+	# 	@offset -= 1
+	# 	if @offset < -2
+	# 		@offset = 0
+	# 		move_left_one_full
+	# 	end
+	# end
 
 	def get_mark_under_reader
 		current_space.read_mark
 	end
 
-	def move_left_one_full
-		@right = @right.unshift(@current_space)
-		@current_space = @left.shift
-		@left << Space.new
+	def move_one_full(direction)
+		to,from = (direction == :right ? [@right,@left] : [@left,@right])
+		from = from.unshift(@current_space)
+		@current_space = to.shift
+		to << Space.new
 	end
-
-	def move_right_one_full
-		@left = @left.unshift(@current_space)
-		@current_space = @right.shift
-		@right << Space.new #TODO add colors
-	end
+	#
+	# def move_right_one_full
+	# 	@left = @left.unshift(@current_space)
+	# 	@current_space = @right.shift
+	# 	@right << Space.new #TODO add colors
+	# end
 
 	private
 

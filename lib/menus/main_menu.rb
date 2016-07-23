@@ -14,7 +14,7 @@ class MainMenu < Menu
   ]
 
   MAIN_MENU_EFFECTS = [ nil,
-    " ProgramReader.new.run_program",
+    Proc.new {ProgramReader.new.run_program},
     " ProgramEditor.new",
     Proc.new {
       begin
