@@ -3,11 +3,13 @@ require_relative "../fundamentals/window_organization.rb"
 class Display
   include WinOrg
   attr_reader :tape
+  attr_accessor :selection
 
   def initialize(tape, log)
     @tape = tape
     @tape_length = 10
     @log = log
+    @selection = 1
   end
 
   def refresh_program_state(program_state)
@@ -74,16 +76,35 @@ class Display
     # info_panel_content << [["Offset: #{tape.offset}"]]
   end
 
+  def make_menu_panel_content
+    menu_panel_content = []
+    menu_panel_content << ["Set Arguments"]
+    menu_panel_content << ["Start"]
+    menu_panel_content << ["Restart"]
+    menu_panel_content << ["Finish"]
+    menu_panel_content << ["Load Program"]
+    menu_panel_content[selection-1].red
+    menu_panel_content
+  end
+
   def make_and_combine_panels
     refresh_window_information and refresh_tape_length
-    tape_panel = Panel.new(0.47,0.8,
+
+    menu_panel = Panel.new(0.47,0.4,
+                          make_menu_panel_content,
+                          title: "Menu",
+                          padded: true)
+
+    tape_panel = Panel.new(0.47,0.4,
                           make_tape_panel_content,
                           title: "Tape Display",
                           padded: true)
 
+    left_panel = menu_panel.place_on_top_of(tape_panel)
+
     margin = Panel.new(0.03,0.8,[[]], background_color: :light_black)
 
-    tape_panel = margin.place_side_by_side(tape_panel)
+    left_panel = margin.place_side_by_side(left_panel)
 
     state_info_panel = Panel.new(0.47,0.5,
                           make_info_panel_content,
@@ -98,7 +119,7 @@ class Display
     info_panel = state_info_panel.place_on_top_of(log_panel)
 
     info_panel = info_panel.place_side_by_side(margin)
-    central_panel = tape_panel.place_side_by_side(info_panel)
+    central_panel = left_panel.place_side_by_side(info_panel)
 
     top_panel = Panel.new(1, 0.1, [[""]],
                           title: "Program Viewer",
