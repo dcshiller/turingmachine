@@ -11,30 +11,45 @@ class ProgramReader
 
 	def initialize
 		@pause = false
-		@tape = Tape.new(:x,:x,:x,:"0",:x,:x)
+		@arguments = [1,1]
+		@tape = set_initial_tape_state
     @log = []
 		@display = Display.new(@tape, @log)
 		@program_state = $program
-		@finished = false
+		@finished = true
 		#at_exit {full_clear}
 	end
 
-	def run_display
+	def set_initial_tape_state
+		initial_symbols = []
+		@arguments.each do |argument|
+			argument.times {initial_symbols << :x}
+			initial_symbols << :"0"
+		end
+		@tape = Tape.new(*initial_symbols)
+	end
+
+	def handle_input
+		# @display.render_panels
 		if STDIN.ready?
-			i = 0
-			until i > 5
-				@pause =  true
+			STDIN.echo = false
+			loop do
 				case get_keystroke
 				when "\e[A"
 					@display.selection -= 1 unless @display.selection <= 0
 				when "\e[B"
 					@display.selection += 1 unless @display.selection >= 5
+				when "\n", "\r"
+					break
 				end
 				@display.render_panels
-				i +=1
 			end
-			@pause = false
-		 end
+
+		end
+	end
+
+	def run_display
+		@display.initial_arguments = @arguments
 		@display.refresh_program_state(@program_state)
 	end
 
@@ -70,9 +85,11 @@ class ProgramReader
 	end
 
   def run_program
-		until @finished
-			step_program
+		loop do
 			run_display
+			# @display.render_panels
+			step_program #unless @finished
+			handle_input
 		end
 	end
 
