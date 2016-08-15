@@ -3,11 +3,12 @@ require_relative "../fundamentals/window_organization.rb"
 class Display
   include WinOrg
   attr_reader :tape
-  attr_accessor :selection
+  attr_accessor :selection, :initial_arguments
 
   def initialize(tape, log)
     @tape = tape
     @tape_length = 10
+    @initial_arguments
     @log = log
     @selection = 1
   end
