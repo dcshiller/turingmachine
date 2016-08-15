@@ -9,7 +9,7 @@ def get_keystroke
   if key == "\e" then key << STDIN.read_nonblock(3) rescue nil end
   if key == "\e" then key << STDIN.read_nonblock(2) rescue nil end
   STDIN.cooked!
-  STDIN.echo = true
+  # STDIN.echo = true
   # STDOUT.sync = true
   key
 end
