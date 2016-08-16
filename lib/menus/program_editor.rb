@@ -84,7 +84,7 @@ class ProgramEditor
 
     bottom_panel = Panel.new(1, 0.1,
                                 [ [center("'s': save, 'l': load,  'enter': switch focus, 'spacebar': change setting")],
-                                  [center("'new/enter': make a new state, 'm': return to menut")], ],
+                                  [center("'new/enter': make a new state, 'm': return to menu")], ],
                                 background_color: :light_black)
 
     middle_panels = state_list_panel.place_side_by_side(state_innards_panel)
