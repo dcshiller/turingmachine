@@ -4,17 +4,18 @@ require 'byebug'
 require_relative 'lib/display/program_reader'
 require_relative 'lib/menus/main_menu'
 require_relative 'lib/menus/splash'
-# require_relative 'lib/display/tape'
 
 class TuringSim
-  include WinOrg, KeyInput #Splash,
+  include WinOrg, KeyInput
 
   def initialize
     $program = MachineState.make_adder
     set_terminal_settings and at_exit { system("clear"); reset_terminal_settings }
+    system("printf '\e[8;40;120t'")
     splash
     MainMenu.instance
     system("setterm -cursor on")
+    STDIN.echo = false
   end
 
   private
@@ -23,7 +24,6 @@ class TuringSim
     system("setterm -cursor on")
     STDIN.echo = true
     STDIN.cooked!
-    #system("clear")
   end
 
   def set_terminal_settings
