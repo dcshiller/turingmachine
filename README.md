@@ -11,22 +11,38 @@ Turing machines are abstract computers invented by Alan Turing. A machine consis
 
 ## Terminal Program
 
-The program is designed to be run from the terminal in either Apple or Linux operating systems with Ruby installed. Download the program and navigate a console to the folder where 'turingsim.rb' is located. The program runs with the command "ruby turingsim.rb".
+The program is designed to be run from the console in either Apple or Linux operating systems with Ruby installed. Download the program and navigate a console to the folder where 'turingsim.rb' is located. The program runs with the command "ruby turingsim.rb".
 
-The Turing Machine Simulator will produce a graphical user interface within the terminal using a custom panel system. The keyboard can be used to move between menu options and to build Turing machines.
+The Turing Machine Simulator produces a graphical user interface within the terminal using a custom panel system. The keyboard can be used to move between menu options and to build Turing machines.
 
 ## Navigation
 
 The program links several different primary components through a central menu. The menu is implemented as a paired array of menu option strings and menu options procs.
 
-![MainMenu] ![MainMenuCode]
+![MainMenu]
 [MainMenu]: ./docs/MainMenu.png
-[MainMenuCode]: ./docs/MainMenuCode.png
 
+```ruby
+MAIN_MENU_OPTIONS = [
+  "What is a Turing Machine?",
+  "Run Program",
+  "Edit/Write Program",
+  "Load Program",
+  "Exit"
+]
+
+MAIN_MENU_EFFECTS = [
+  Proc.new { introduction_info },
+  Proc.new { ProgramReader.new.run_program },
+  Proc.new { ProgramEditor.new },
+  Proc.new { load_program },
+  Proc.new { full_clear; exit}
+]
+```
 
 ## Panels
 
-Individual displays are constructed using a custom module for constructing and combining colored panels. Each panel is an array of array of strings, so that individual strings can be assigned their own background and text colors.
+Individual displays are constructed using a custom module for building and combining colored panels. Each panel is an array of array of strings, so that individual strings can be assigned their own background and text colors. Individual features are provided through an options hash.
 
 ![ProgramDisplay]
 [ProgramDisplay]: ./docs/ProgramDisplay.png
@@ -49,8 +65,9 @@ Individual displays are constructed using a custom module for constructing and c
                                 background_color: :white,
                                 padded: true)
 ```
+Panels are directly added to each other with place_on_top_of and place_side_by_side methods. Margins are added as very slim colored panels.
 
-Individual panels are updated as needed based on changes in input, preventing the need for fully reconstructing the whole view each time the state of the machine changes.   
+Individual panels are updated as needed based on changes in input, avoiding the need for fully reconstructing the whole view each time the state of the machine changes.   
 
 ```ruby
 def make_and_combine_panels
@@ -62,7 +79,7 @@ def make_and_combine_panels
 
 ## Program Structure
 
-The Turing machines themselves are implemented across three different classes. The abstract program details are saved in a MachineState class, that reflects how the program will run on a given input. A instance of the Machine State class is a single node in the state-tree of the machine. From a given state, all downstream states can be recursively recovered.
+The Turing machines themselves are implemented across three different classes. The abstract program details are saved in a MachineState class that records how the program will run on a given input. A instance of the MachineState class is a single node in the state-tree of the machine. From a given state, all downstream states can be recursively recovered.
 
 ```ruby
   def self.get_downstream_states(state, states = [])
@@ -77,9 +94,9 @@ The Turing machines themselves are implemented across three different classes. T
   end  
 ```
 
-These machines do not track of the tape. For that, a tape class is used. The tape class is essentially built from three arrays representing the left spaces, space under the reader, and right spaces. The reader is moved by popping or shifting from the respective array into the current space and shuffling the prior current space onto the other array. This allows for a unlimited amount of memory.
+These machines do not track of the tape. For that, a tape class is used. The tape class is essentially built from three arrays representing the left spaces, space under the reader, and right spaces. The reader is moved by popping or shifting from the respective array into the current space and shuffling the prior current space onto the other array. This allows for an unlimited amount of memory.
 
-The tape class is intimately connected with the user interface, and records the position of the tape with colorized strings. Though this surely could be done more efficiently, without actually displaying the tape the program can find the result fairly fast. Using its finish feature, it has been clocked to around 20,000 machine steps per second on a standard contemporary laptop.
+The tape class is intimately connected with the user interface, and records the position of the tape with colorized strings. Though this surely could be done more efficiently, if it does not actually display the tape, the program can find the result fairly fast. Using its *finish* feature, it has been clocked to around 20,000 machine steps per second on a standard contemporary laptop.
 
 ```ruby
 class Tape
@@ -113,7 +130,7 @@ Programs can be accessed and modified from Program Editor.
 ![Editor]
 [Editor]: ./docs/Editor.png
 
-Editing toggles the settings
+Editing toggles the settings of individual states, running through the available options by keypress. This program was not designed for making massive Turing machines.
 
 ```ruby
   def toggle_state_behavior
