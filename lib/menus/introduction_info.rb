@@ -20,18 +20,12 @@ require_relative '../fundamentals/key_input'
     get_keystroke
   end
 
-  def info
+  def split_words(words)
     text_width = refresh_window_information[0]/3
-    words = "This is a ruby terminal program designed to create and display Turing machines. \n
-    Turing machines are abstract computers invented by Alan Turing. A machine consists of a string of tape that is infinite in both directions and segmented into sections. Each section may be blank or contain a symbol. The machine is able to read the symbol at a specific position and then either write a different symbol, move the tape one space to the left or right, or stop running. \n
-    A program for a Turing machine consists in a series of states that each describe the machines behavior given a certain input and direct the machine what state to move into next. \n
-    ".split(" ")
-    words = "This is a ruby terminal program designed to create and display Turing machines.".split(" ") if text_width < 30;
-
-    lines, line = [[""],[""],[""]], ""
-
+    words = words.split(" ")
+    lines, line = [[""],[""]], ""
     while words.length > 0
-      while words.length > 0 && line.length + words[0].length < text_width
+      while words.length > 0 && line.length + words[0].length < text_width - 1
         line += words.shift + " "
       end
       lines << [line]
@@ -39,4 +33,13 @@ require_relative '../fundamentals/key_input'
       line = ""
     end
     lines
+  end
+
+  def info
+    # return split_words("This is a ruby terminal program designed to create and display Turing machines.")
+    lines = split_words("This is a ruby terminal program designed to create and display Turing machines.")
+    # lines << [""]
+    lines.concat(split_words("Turing machines are abstract computers invented by Alan Turing. A Turing machine consists of a string of tape that is infinite in both directions and segmented into sections. Each section may be blank or contain a symbol. The machine is able to read the symbol at a specific position and then either write a different symbol, move the tape one space to the left or right, or stop running."))
+    # lines << [""]
+    lines.concat(split_words("A program for a Turing machine consists in a series of states that each describe the machines behavior given a certain input and direct the machine what state to move into next."))
   end
