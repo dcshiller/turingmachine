@@ -3,12 +3,13 @@ require_relative '../fundamentals/window_organization'
 require_relative '../fundamentals/array_colors'
 require_relative '../machinelogic/machine_state'
 require_relative '../fundamentals/key_input'
+require_relative '../fundamentals/machine_writer'
 require 'colorize'
 require 'io/console'
 require_relative 'panels'
 
 class ProgramEditor
-    include WinOrg, KeyInput
+    include WinOrg, KeyInput, MachineWriter
 
   def initialize(program = MachineState.make_adder)
     # system("stty -echo"
@@ -35,15 +36,27 @@ class ProgramEditor
     end
   end
 
+  def get_right_panel_colors(entry_number)
+    if focus_left?
+      :black
+    else
+      [:red, :black, :black, :black].rotate(-1*@rselection)[entry_number]
+    end
+  end
+
+  def right_panel_process_text (text, entry_number)
+    (text || " ").colorize(get_right_panel_colors(entry_number))
+  end
+
   def right_panel_content
     return [[""], ["", ""], ["", ""]] if @program_states[@lselection] == nil
     state_info = @program_states[@lselection].get_state_information_hash
-    text_colors = focus_left? ? Array.new(4,:black) : [:red, :black, :black, :black].rotate(-1*@rselection)
+
     @state_number[0] = (state_info["state_number"] || " ").black
-    @state_if_x[0] = ("Do " + state_info["input_x_behavior"] || " ").colorize(text_colors[0])
-    @state_if_x[1] = (" and go to " + state_info["input_x_state"] || " ").colorize(text_colors[1])
-    @state_if_o[0] = ("Do " + state_info["input_o_behavior"] || " ").colorize(text_colors[2])
-    @state_if_o[1] = (" and go to " + state_info["input_o_state"] || " ").colorize(text_colors[3])
+    @state_if_x[0] = right_panel_process_text("Go " + state_info["input_x_behavior"], 0)
+    @state_if_x[1] = right_panel_process_text(" and go to " + state_info["input_x_state"], 1)
+    @state_if_o[0] = right_panel_process_text("Go " + state_info["input_o_behavior"], 2)
+    @state_if_o[1] = right_panel_process_text(" and go to " + state_info["input_o_state"], 3)
     @program_state_data
   end
 
@@ -104,7 +117,7 @@ class ProgramEditor
 
   def save
     yaml_program_states = YAML.dump(@program_states)
-    file_name = full_screen_gets("File name:").chomp + ".tm"
+    file_name = "./programs/" + full_screen_gets("File name:").chomp + ".tm"
     File.open(file_name, "w") do |file|
       file.write(yaml_program_states)
     end
@@ -112,7 +125,7 @@ class ProgramEditor
   end
 
   def load
-    file_name = full_screen_gets("File name:").chomp + ".tm"
+    load_program
     yaml_program_states = File.read(file_name)
     @program_states = YAML.load(yaml_program_states)
     get_program_state_names
@@ -122,10 +135,8 @@ class ProgramEditor
     loop do
        color_selection
        window = make_and_combine_panels
-       #system("echo -e \033c")
        full_clear
        system("setterm -cursor off")
-       # system("tput reset") # \printf "\ec"
        window.draw_content
        STDIN.echo = false
       case get_keystroke
@@ -140,22 +151,7 @@ class ProgramEditor
         @focus.rotate![1]
       when " "
         if focus_right?
-          behaviors = [:markx, :mark0, :right, :left, :halt]
-          program = @program_states[@lselection]#.select {|program| program.number_tag == @program_state_names[@lselection][0].uncolorize}.first
-          input = (@rselection % 4 <= 1) ? :x : :"0"
-          go_to_state = program.get_next_state(input)
-
-          current_behavior_number = behaviors.find_index(program.get_behavior(input))
-
-          new_behavior_number = @rselection.even? ? ((current_behavior_number + 1) % 5) : current_behavior_number
-
-          current_state_number = @program_states.find_index(go_to_state)
-          if @rselection.odd? && current_state_number <= @program_states.count-2
-            go_to_state = @program_states[current_state_number + 1]
-          elsif @rselection.odd?
-            go_to_state = @program_states[0]
-          end
-          program.set_behavior(input => [behaviors[new_behavior_number], go_to_state])
+          toggle_state_behavior
         end
       when "s"
         save
@@ -182,6 +178,25 @@ class ProgramEditor
       else
       end
     end
+  end
+
+  def toggle_state_behavior
+    behaviors = [:markx, :mark0, :right, :left, :halt]
+    program = @program_states[@lselection]
+    input = (@rselection % 4 <= 1) ? :x : :"0"
+    go_to_state = program.get_next_state(input)
+
+    current_behavior_number = behaviors.find_index(program.get_behavior(input))
+
+    new_behavior_number = @rselection.even? ? ((current_behavior_number + 1) % 5) : current_behavior_number
+
+    current_state_number = @program_states.find_index(go_to_state)
+    if @rselection.odd? && current_state_number <= @program_states.count-2
+      go_to_state = @program_states[current_state_number + 1]
+    elsif @rselection.odd?
+      go_to_state = @program_states[0]
+    end
+    program.set_behavior(input => [behaviors[new_behavior_number], go_to_state])
   end
 
 end
