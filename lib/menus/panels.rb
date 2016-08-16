@@ -8,24 +8,31 @@ class Panel
 
   def initialize(width_percentage, height_percentage, content, options = {}) #Options: title = nil, background_color = nil, padded = false)
     refresh_window_information
-    @width_percentage,@height_percentage = width_percentage, height_percentage
+    @width_percentage, @height_percentage = width_percentage, height_percentage
     @panel_width, @panel_height = @cols * width_percentage, @rows * height_percentage
     @content = content.dup
+
     pad_content if options[:padded]
     @content.unshift([center(options[:title])]) if options[:title]
     @background_color = options[:background_color] if options[:background_color]
+
     make_content_fit
     colorize_content
+  end
+
+
+  def extra_space_if_needed
+    if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
+        @cols * (self.width_percentage + second_panel.width_percentage)
+       [[" "]]
+     else
+       [[]]
+     end
   end
 
   def pad_content
     @content.collect!.with_index {|el,idx| [[" "] + el] }
   end
-  #
-  # def center_title
-  #   row_content = @content[0].join("")
-  #   @content[0] = [center(row_content)]
-  # end
 
   def make_content_fit
     subtract_rows_to_height
@@ -44,7 +51,6 @@ class Panel
   def fill_in_row_to_reach_width(row_number)
     row_content = @content[row_number].join("")
     row_length = row_content.uncolorize.length
-    # debugger if @panel_width <= row_length + 1
     [row_content + " "*([@panel_width - row_length,0].max)]
   end
 
@@ -64,13 +70,8 @@ class Panel
   end
 
   def place_side_by_side(second_panel)
-    raise "Heights don't align" if self.height_percentage != second_panel.height_percentage
-    if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
-       @cols * (self.width_percentage + second_panel.width_percentage)
-       extra_space = [[" "]]
-     else
-       extra_space = [[]]
-     end
+    raise "Heights must align" if self.height_percentage != second_panel.height_percentage
+    extra_space = extra_space_if_needed
 
     merged_content = content.collect.with_index {|line, index| line + extra_space + second_panel.content[index]}
     Panel.new(

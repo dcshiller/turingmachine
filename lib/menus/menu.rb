@@ -7,9 +7,9 @@ class Menu
   attr_reader :options, :effects
   attr_accessor :selection
 
-  def initialize(selection, effects, title)
+  def initialize(options, effects, title)
    @selection = -1
-   @options, @effects = selection,effects
+   @options, @effects = options, effects
    @menu_title = title
    selection_loop
   end
@@ -23,8 +23,7 @@ class Menu
       when "\e[B"
         @selection += 1 unless @selection >= options.length - 1
       when "\r", "\n"
-        self.instance_eval effects[selection] if effects[selection].is_a?(String)
-        self.instance_eval &effects[selection] if effects[selection].is_a?(Proc)
+        self.instance_eval &effects[selection] 
       when "b"
         break
       else
