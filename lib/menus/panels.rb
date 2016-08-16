@@ -29,15 +29,14 @@ class Panel
   end
 
   def draw_content
+    joined_content = content.collect {|con| con.join("")}.join("")
     full_clear
-    content.each do |line|
-       puts line.join("")
-    end
+    puts joined_content
   end
 
-  def extra_space_if_needed
-    if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
-        @cols * (self.width_percentage + second_panel.width_percentage)
+  def extra_space_if_needed(first_panel, second_panel)
+    if (@cols * first_panel.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
+            @cols * (first_panel.width_percentage + second_panel.width_percentage)
        [[" "]]
      else
        [[]]
@@ -79,7 +78,7 @@ class Panel
 
   def place_side_by_side(second_panel)
     raise "Heights must align" if self.height_percentage != second_panel.height_percentage
-    extra_space = extra_space_if_needed
+    extra_space = extra_space_if_needed(self, second_panel)
 
     merged_content = content.collect.with_index {|line, index| line + extra_space + second_panel.content[index]}
     Panel.new(
@@ -88,4 +87,5 @@ class Panel
               merged_content
               )
   end
+
 end
