@@ -20,38 +20,8 @@ class Panel
     colorize_content
   end
 
-
-  def extra_space_if_needed
-    if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
-        @cols * (self.width_percentage + second_panel.width_percentage)
-       [[" "]]
-     else
-       [[]]
-     end
-  end
-
-  def pad_content
-    @content.collect!.with_index {|el,idx| [[" "] + el] }
-  end
-
-  def make_content_fit
-    subtract_rows_to_height
-    add_rows_to_reach_height
-    content.collect!.with_index {|row,row_number| fill_in_row_to_reach_width(row_number)}
-  end
-
-  def subtract_rows_to_height
-    @content = @content[0...@panel_height]
-  end
-
   def add_rows_to_reach_height
     (panel_height - content.count).to_i.times { content << []}
-  end
-
-  def fill_in_row_to_reach_width(row_number)
-    row_content = @content[row_number].join("")
-    row_length = row_content.uncolorize.length
-    [row_content + " "*([@panel_width - row_length,0].max)]
   end
 
   def colorize_content
@@ -65,8 +35,46 @@ class Panel
     end
   end
 
+  def extra_space_if_needed
+    if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
+        @cols * (self.width_percentage + second_panel.width_percentage)
+       [[" "]]
+     else
+       [[]]
+     end
+  end
+
+  def make_content_fit
+    subtract_rows_to_height
+    add_rows_to_reach_height
+    content.collect!.with_index {|row,row_number| fill_in_row_to_reach_width(row_number)}
+  end
+
+  def pad_content
+    @content.collect!.with_index {|el,idx| [[" "] + el] }
+  end
+
+  def subtract_rows_to_height
+    @content = @content[0...@panel_height]
+  end
+
+  def fill_in_row_to_reach_width(row_number)
+    row_content = @content[row_number].join("")
+    row_length = row_content.uncolorize.length
+    [row_content + " "*([@panel_width - row_length,0].max)]
+  end
+
   def padded?
     @padded
+  end
+
+  def place_on_top_of(second_panel)
+    raise "Widths don't align" if self.width_percentage != second_panel.width_percentage
+    Panel.new(
+              width_percentage,
+              height_percentage + second_panel.height_percentage,
+              content + second_panel.content
+              )
   end
 
   def place_side_by_side(second_panel)
@@ -78,15 +86,6 @@ class Panel
               width_percentage + second_panel.width_percentage,
               height_percentage,
               merged_content
-              )
-  end
-
-  def place_on_top_of(second_panel)
-    raise "Widths don't align" if self.width_percentage != second_panel.width_percentage
-    Panel.new(
-              width_percentage,
-              height_percentage + second_panel.height_percentage,
-              content + second_panel.content
               )
   end
 end
