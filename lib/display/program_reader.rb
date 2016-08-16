@@ -58,7 +58,7 @@ class ProgramReader
     3.times do |idx|
       tape.offset_to(direction)
 			@update[:tape] = true
-			unless quickly
+			unless quickly || STDIN.ready?
 				@display.render_panels
 				idx == 2 ? sleep(0.5) : sleep(0.2)
 			end
@@ -124,8 +124,8 @@ class ProgramReader
 
 	def write_mark(mark, quickly)
     log_write("Write #{mark}")
-		sleep(0.5) unless quickly
+		sleep(0.5) unless quickly || STDIN.ready?
 		tape.write_mark(mark)
-		sleep(0.5) unless quickly
+		sleep(0.5) unless quickly || STDIN.ready?
 	end
 end
