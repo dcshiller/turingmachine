@@ -82,20 +82,21 @@ class Display
     menu_panel_content << ["Restart"]
     menu_panel_content << ["Finish"]
     menu_panel_content << ["Load Program"]
-    menu_panel_content[selection].red
+    menu_panel_content << ["Back to Menu"]
+    @update[:tape] ? menu_panel_content << ["(Enter to select)"] : menu_panel_content[selection].red
     menu_panel_content
   end
 
   def make_tape_panel_content
     return @tape_panel_content unless @update[:tape]
     @tape_panel_content = []
-    1.times {@tape_panel_content << [[""]]}
+    @tape_panel_content << [[""]]
     @tape_panel_content << arrow(:up)
     tape_array = build_tape_array
     tape_array = offset(tape_array, tape.offset )
     @tape_panel_content << [tape_array]
     @tape_panel_content << arrow(:down)
-    @tape_panel_content << [[''],["Argument Summary: #{@tape.get_summary}"]]
+    @tape_panel_content << [[''],["Tape Summary: #{@tape.get_summary}"]]
   end
 
   def make_and_combine_panels
