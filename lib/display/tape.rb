@@ -18,29 +18,21 @@ class Tape
 		@offset = 0
 	end
 
-	def self.color(iteration)
-		COLORS.rotate(iteration)[0]
-	end
-
-	def write_mark(new_mark)
-		current_space.write_mark(new_mark)
-	end
-
-	def offset_to(direction)
-		@offset += (direction == :right ? 1 : -1)
-		if @offset > 2 || @offset < -2
-			@offset = 0
-			move_one_full(direction)
+	def get_summary
+		left_args = @left.collect {|space| space.read_mark}
+		left_args = left_args.join("").split('0')
+		left_args = left_args.collect {|arg_sequence| arg_sequence.length}
+		left_args.unshift(0)
+		right_args = @right.collect {|space| space.read_mark}
+		right_args = right_args.join("").split('0')
+		right_args = right_args.collect {|arg_sequence| arg_sequence.length}
+		if @current_space.read_mark == :x
+			right_args[0] = (right_args[0] || 0) + (left_args.pop || 0) + 1
 		end
+		all_args = left_args.concat(right_args)
+		all_args.delete(0)
+		all_args.join(",")# if all_args
 	end
-	#
-	# def offset_left
-	# 	@offset -= 1
-	# 	if @offset < -2
-	# 		@offset = 0
-	# 		move_left_one_full
-	# 	end
-	# end
 
 	def get_mark_under_reader
 		current_space.read_mark
@@ -52,12 +44,22 @@ class Tape
 		@current_space = to.shift
 		to << Space.new
 	end
-	#
-	# def move_right_one_full
-	# 	@left = @left.unshift(@current_space)
-	# 	@current_space = @right.shift
-	# 	@right << Space.new #TODO add colors
-	# end
+
+	def offset_to(direction)
+		@offset += (direction == :right ? 1 : -1)
+		if @offset > 2 || @offset < -2
+			@offset = 0
+			move_one_full(direction)
+		end
+	end
+
+	def self.color(iteration)
+		COLORS.rotate(iteration)[0]
+	end
+
+	def write_mark(new_mark)
+		current_space.write_mark(new_mark)
+	end
 
 	private
 
