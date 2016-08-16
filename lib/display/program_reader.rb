@@ -7,15 +7,16 @@ require 'io/wait'
 require 'byebug'
 
 class ProgramReader
-	include KeyInput, WinOrg
+	include KeyInput, WinOrg, MachineWriter
 	attr_reader :tape
 
 	MENU_EFFECTS = [
-			Proc.new { set_arguments},
-			Proc.new { "break "},
-			Proc.new { reset},
-			Proc.new { run_program_to_end},
-			Proc.new { load_program}
+			Proc.new { set_arguments },
+			Proc.new { "break" },
+			Proc.new { reset },
+			Proc.new { run_program_to_end },
+			Proc.new { load_program },
+			Proc.new { @done = true; "break" }
 	]
 
 	def initialize
@@ -24,26 +25,26 @@ class ProgramReader
 		@update = {tape: true, menu: true}
 		@display = Display.new(@tape, @log, @update)
 		reset
-		@finished = true
+		@first_time = true
 	end
 
 	def handle_input
-		if STDIN.ready?
-			STDIN.echo = false
-			loop do
-				case get_keystroke
-				when "\e[A"
-					@display.selection -= 1 unless @display.selection <= 0
-				when "\e[B"
-					@display.selection += 1 unless @display.selection >= 5
-				when "\n", "\r"
-					should_break = self.instance_eval &MENU_EFFECTS[@display.selection]
-					break if should_break
-				end
-				@update[:menu] = true
-				@display.render_panels
+		@update[:menu] = true
+		@display.render_panels
+		loop do
+			case get_keystroke
+			when "\e[A"
+				@display.selection -= 1 unless @display.selection <= 0
+			when "\e[B"
+				@display.selection += 1 unless @display.selection >= 5
+			when "\n", "\r"
+				should_break = self.instance_eval &MENU_EFFECTS[@display.selection]
+				break if should_break == "break"
 			end
+			@update[:menu] = true
+			@display.render_panels
 		end
+		@update[:menu] = true
 	end
 
 	def log_write(string)
@@ -73,11 +74,12 @@ class ProgramReader
 	end
 
 	def run_program
-		STDIN.echo = false
+		# STDIN.echo = false
 		loop do
 			@display.refresh_program_state(@program_state)
 			step_program
-			handle_input
+			handle_input if STDIN.ready?
+			break if @done
 		end
 	end
 
@@ -91,7 +93,7 @@ class ProgramReader
 	end
 
 	def set_arguments
-		argument_strings = full_screen_gets("Arguments (example: 4,4,2): ").split(",")
+		argument_strings = full_screen_gets("Arguments: ", ["Arguments must be in x,y,z format.", ""]).split(",")
 		@arguments = argument_strings.map {|arg_string| arg_string.to_i}
 		reset
 	end
