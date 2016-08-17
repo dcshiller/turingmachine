@@ -27,13 +27,42 @@ class ProgramEditor
     selection_loop
   end
 
-  def left_panel_content
-    num_rows = @rows * 0.8
-    if @lselection >= num_rows -1
-      return @program_state_names[(@lselection-num_rows+2)..@lselection+1]
+  def add_new_state
+    new_state = MachineState.new(@lselection+1)
+    new_state.set_behavior(:x => [:halt, new_state], :"0" => [:halt, new_state])
+    @program_states << new_state
+    get_program_state_names
+  end
+
+  def color_selection
+    if focus_left?
+      @program_state_names[@lselection-1][0] = @program_state_names[@lselection-1][0].black if @program_state_names[@lselection-1]
+      @program_state_names[@lselection+1][0] = @program_state_names[@lselection+1][0].black if @program_state_names[@lselection+1]
+      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].red if @lselection >= 0 && @program_state_names[@lselection]
     else
-      @program_state_names
+      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].blue if @lselection >= 0 && @program_state_names[@lselection]
     end
+  end
+
+  def draw_window
+    color_selection
+    window = make_and_combine_panels
+    full_clear
+    system("setterm -cursor off")
+    window.draw_content
+    STDIN.echo = false
+  end
+
+  def focus_left?
+    @focus.first == :left
+  end
+
+  def focus_right?
+    !focus_left?
+  end
+
+  def get_program_state_names
+    @program_state_names = @program_states.collect {|program_state| [program_state.number_tag].black}  + [["--> new".black]]
   end
 
   def get_right_panel_colors(entry_number)
@@ -48,16 +77,20 @@ class ProgramEditor
     (text || " ").colorize(get_right_panel_colors(entry_number))
   end
 
-  def right_panel_content
-    return [[""], ["", ""], ["", ""]] if @program_states[@lselection] == nil
-    state_info = @program_states[@lselection].get_state_information_hash
+  def left_panel_content
+    num_rows = @rows * 0.8
+    if @lselection >= num_rows -1
+      return @program_state_names[(@lselection-num_rows+2)..@lselection+1]
+    else
+      @program_state_names
+    end
+  end
 
-    @state_number[0] = (state_info["state_number"] || " ").black
-    @state_if_x[0] = right_panel_process_text("Go " + state_info["input_x_behavior"], 0)
-    @state_if_x[1] = right_panel_process_text(" and go to " + state_info["input_x_state"], 1)
-    @state_if_o[0] = right_panel_process_text("Go " + state_info["input_o_behavior"], 2)
-    @state_if_o[1] = right_panel_process_text(" and go to " + state_info["input_o_state"], 3)
-    @program_state_data
+  def load
+    load_program
+    yaml_program_states = File.read(file_name)
+    @program_states = YAML.load(yaml_program_states)
+    get_program_state_names
   end
 
   def make_and_combine_panels
@@ -93,26 +126,16 @@ class ProgramEditor
     top_and_middle_panels.place_on_top_of(bottom_panel)
   end
 
-  def color_selection
-    if focus_left?
-      @program_state_names[@lselection-1][0] = @program_state_names[@lselection-1][0].black if @program_state_names[@lselection-1]
-      @program_state_names[@lselection+1][0] = @program_state_names[@lselection+1][0].black if @program_state_names[@lselection+1]
-      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].red if @lselection >= 0 && @program_state_names[@lselection]
-    else
-      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].blue if @lselection >= 0 && @program_state_names[@lselection]
-    end
-  end
+  def right_panel_content
+    return [[""], ["", ""], ["", ""]] if @program_states[@lselection] == nil
+    state_info = @program_states[@lselection].get_state_information_hash
 
-  def focus_left?
-    @focus.first == :left
-  end
-
-  def focus_right?
-    !focus_left?
-  end
-
-  def get_program_state_names
-    @program_state_names = @program_states.collect {|program_state| [program_state.number_tag].black}  + [["--> new".black]]
+    @state_number[0] = (state_info["state_number"] || " ").black
+    @state_if_x[0] = right_panel_process_text("Go " + state_info["input_x_behavior"], 0)
+    @state_if_x[1] = right_panel_process_text(" and go to " + state_info["input_x_state"], 1)
+    @state_if_o[0] = right_panel_process_text("Go " + state_info["input_o_behavior"], 2)
+    @state_if_o[1] = right_panel_process_text(" and go to " + state_info["input_o_state"], 3)
+    @program_state_data
   end
 
   def save
@@ -124,35 +147,16 @@ class ProgramEditor
     sleep(3)
   end
 
-  def load
-    load_program
-    yaml_program_states = File.read(file_name)
-    @program_states = YAML.load(yaml_program_states)
-    get_program_state_names
-  end
-
   def selection_loop
     loop do
-       color_selection
-       window = make_and_combine_panels
-       full_clear
-       system("setterm -cursor off")
-       window.draw_content
-       STDIN.echo = false
+     draw_window
       case get_keystroke
       when "\r", "\n"
-        if @lselection == @program_state_names.count - 1
-          new_state = MachineState.new(@lselection+1)
-          new_state.set_behavior(:x => [:halt, new_state], :"0" => [:halt, new_state])
-          @program_states << new_state
-          get_program_state_names
-        end
+        add_new_state if @lselection == @program_state_names.count - 1
         @rselection = 0
         @focus.rotate![1]
       when " "
-        if focus_right?
-          toggle_state_behavior
-        end
+        toggle_state_behavior if focus_right?
       when "s"
         save
       when "l"
