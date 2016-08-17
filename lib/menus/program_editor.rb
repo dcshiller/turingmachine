@@ -36,11 +36,11 @@ class ProgramEditor
 
   def color_selection
     if focus_left?
-      @program_state_names[@lselection-1][0] = @program_state_names[@lselection-1][0].black if @program_state_names[@lselection-1]
-      @program_state_names[@lselection+1][0] = @program_state_names[@lselection+1][0].black if @program_state_names[@lselection+1]
-      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].red if @lselection >= 0 && @program_state_names[@lselection]
+      @program_state_names[@lselection-1][0] = @program_state_names[@lselection-1][0].black   if @program_state_names[@lselection-1]
+      @program_state_names[@lselection+1][0] = @program_state_names[@lselection+1][0].black   if @program_state_names[@lselection+1]
+      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].red         if @lselection >= 0 && @program_state_names[@lselection]
     else
-      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].blue if @lselection >= 0 && @program_state_names[@lselection]
+      @program_state_names[@lselection][0] = @program_state_names[@lselection][0].blue        if @lselection >= 0 && @program_state_names[@lselection]
     end
   end
 
@@ -62,7 +62,10 @@ class ProgramEditor
   end
 
   def get_program_state_names
-    @program_state_names = @program_states.collect {|program_state| [program_state.number_tag].black}  + [["--> new".black]]
+    @program_state_names = @program_states.collect do |program_state|
+      [program_state.number_tag].black
+    end
+    @program_state_names += [["--> new".black]]
   end
 
   def get_right_panel_colors(entry_number)
