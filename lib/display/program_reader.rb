@@ -20,7 +20,6 @@ class ProgramReader
 	]
 
 	def initialize
-		@pause = false
 		@arguments = [1,1]
 		@update = {tape: true, menu: true}
 		@display = Display.new(@tape, @log, @update)
@@ -106,7 +105,6 @@ class ProgramReader
 		end
 		@tape = Tape.new(*initial_symbols)
 	end
-
 
 	def step_program(quickly = false)
 		current_mark = @tape.get_mark_under_reader

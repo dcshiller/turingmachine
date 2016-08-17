@@ -56,10 +56,26 @@ class Display
     string_array.flatten!
 	end
 
+  def arrow(direction)
+    arrow = (direction == :up ? "\u25BC" : "\u25B2")
+    adjustment = (tape_length+1)%2
+    [(" " * ((tape_length*3)/2+adjustment) + arrow.encode("utf-8")).split("")]
+  end
+
   def make_log_panel_content(height)
     log_content = @log.map.with_index {|el, idx| idx.to_s + " " + el}
     log_content.shift until log_content.length < height
     log_content.map {|el| [[el]]}
+  end
+
+  def make_tape_panel_content
+    tape_panel_content = []
+    1.times {tape_panel_content << [[""]]}
+    tape_panel_content << arrow(:up)
+    tape_array = build_tape_array
+    tape_array = offset(tape_array, tape.offset)
+    tape_panel_content << [tape_array]
+    tape_panel_content << arrow(:down)
   end
 
   def make_info_panel_content
@@ -72,7 +88,6 @@ class Display
     @info_panel_content << [["  if 0, then go to " + @program_state.get_behavior_as_string(:x)]]
     @info_panel_content << [["        and go to " + @program_state.get_next_state(:"0").number_tag]]
     @info_panel_content << [["Current Space: " + @tape.current_space.to_s]]
-    # info_panel_content << [["Offset: #{tape.offset}"]]
   end
 
   def make_menu_panel_content

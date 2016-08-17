@@ -79,6 +79,13 @@ class Panel
   def place_side_by_side(second_panel)
     raise "Heights must align" if self.height_percentage != second_panel.height_percentage
     extra_space = extra_space_if_needed(self, second_panel)
+    
+    if (@cols * self.width_percentage).to_i + (@cols*second_panel.width_percentage).to_i <
+       @cols * (self.width_percentage + second_panel.width_percentage)
+       extra_space = [[" "]]
+     else
+       extra_space = [[]]
+     end
 
     merged_content = content.collect.with_index {|line, index| line + extra_space + second_panel.content[index]}
     Panel.new(
@@ -88,4 +95,12 @@ class Panel
               )
   end
 
+  def place_on_top_of(second_panel)
+    raise "Widths don't align" if self.width_percentage != second_panel.width_percentage
+    Panel.new(
+              width_percentage,
+              height_percentage + second_panel.height_percentage,
+              content + second_panel.content
+              )
+  end
 end
