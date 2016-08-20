@@ -11,7 +11,6 @@ class TuringSim
   def initialize
     $program = MachineState.make_adder
     set_terminal_settings and at_exit { system("clear"); reset_terminal_settings }
-    system("printf '\e[8;40;120t'")
     splash
     MainMenu.instance
     system("setterm -cursor on")
@@ -33,4 +32,5 @@ class TuringSim
 
 end
 
+    system("printf '\e[8;40;120t'")
 TuringSim.new
