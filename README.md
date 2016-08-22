@@ -1,5 +1,6 @@
 # Turing Machine Simulator
 
+See also the [User's Guide](USERSGUIDE.md)
 
 ## Introduction
 
