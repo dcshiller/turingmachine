@@ -96,8 +96,8 @@ class MachineState
 
   def number_tag
     ones_digits = ["","One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
-              "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
-              "Nineteen"]
+                  "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen",
+                  "Nineteen"]
     tens_digits = ["","","Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"]
     return ones_digits[number] if number < 20
     tens_digits[(number/10)] + ones_digits[(number % 10)]
