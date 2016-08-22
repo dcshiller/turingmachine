@@ -6,6 +6,10 @@ class Space
     @mark = mark
   end
 
+  def read_mark
+    @mark
+  end
+
   def to_string_array
     empty_space = " ".colorize(background: color)
     mark = "#{@mark}".black.colorize(background: color)
@@ -18,10 +22,6 @@ class Space
 
   def write_mark(new_mark)
     @mark = new_mark
-  end
-
-  def read_mark
-    @mark
   end
 
 end

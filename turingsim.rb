@@ -1,6 +1,5 @@
 require 'io/console'
 require 'colorize'
-require 'byebug'
 require_relative 'lib/display/program_reader'
 require_relative 'lib/menus/main_menu'
 require_relative 'lib/menus/splash'
@@ -32,5 +31,5 @@ class TuringSim
 
 end
 
-    system("printf '\e[8;40;120t'")
+system("printf '\e[8;40;120t'")
 TuringSim.new

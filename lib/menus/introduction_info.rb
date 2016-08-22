@@ -36,10 +36,7 @@ require_relative '../fundamentals/key_input'
   end
 
   def info
-    # return split_words("This is a ruby terminal program designed to create and display Turing machines.")
     lines = split_words("This is a ruby terminal program designed to create and display Turing machines.")
-    # lines << [""]
     lines.concat(split_words("Turing machines are abstract computers invented by Alan Turing. A Turing machine consists of a string of tape that is infinite in both directions and segmented into sections. Each section may be blank or contain a symbol. The machine is able to read the symbol at a specific position and then either write a different symbol, move the tape one space to the left or right, or stop running."))
-    # lines << [""]
     lines.concat(split_words("A program for a Turing machine consists in a series of states that each describe the machines behavior given a certain input and direct the machine what state to move into next."))
   end

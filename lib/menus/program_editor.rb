@@ -12,7 +12,6 @@ class ProgramEditor
     include WinOrg, KeyInput, MachineWriter
 
   def initialize(program = MachineState.make_adder)
-    # system("stty -echo"
     refresh_window_information
     @program = program
     @program_states = MachineState.get_downstream_states(@program)
@@ -26,6 +25,8 @@ class ProgramEditor
     @program_state_data = [@state_number,@state_if_x,@state_if_o]
     selection_loop
   end
+
+  private
 
   def add_new_state
     new_state = MachineState.new(@lselection+1)

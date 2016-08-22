@@ -13,10 +13,6 @@ class Display
     @update = update
   end
 
-  def refresh_program_state(program_state)
-    @program_state = program_state
-  end
-
   def refresh_tape_length
     span = 0.4
     @tape_length = ((@cols/3)*span -1).to_i

@@ -14,23 +14,6 @@ class Menu
    selection_loop
   end
 
-  def selection_loop
-    loop do
-      print_menu_options
-      case get_keystroke
-      when  "\e[A"
-        @selection -= 1 unless @selection < 1
-      when "\e[B"
-        @selection += 1 unless @selection >= options.length - 1
-      when "\r", "\n"
-        self.instance_eval &effects[selection] 
-      when "b"
-        break
-      else
-      end
-    end
-  end
-
   def max_length(array)
     sorted_array = array.sort do |option, option2|
       option.uncolorize.length <=> option2.uncolorize.length
@@ -55,5 +38,22 @@ class Menu
 
   def selected(string)
     string.red
+  end
+
+  def selection_loop
+    loop do
+      print_menu_options
+      case get_keystroke
+      when  "\e[A"
+        @selection -= 1 unless @selection < 1
+      when "\e[B"
+        @selection += 1 unless @selection >= options.length - 1
+      when "\r", "\n"
+        self.instance_eval &effects[selection]
+      when "b"
+        break
+      else
+      end
+    end
   end
 end

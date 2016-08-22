@@ -15,9 +15,6 @@ module WinOrg
   end
 
   def full_clear
-    # system("printf '\33c\e[3J'")
-    # system("\printf '\ec' ")
-    # system('setterm -cursor off')
     system("clear")
     system("\printf '\033[16A'")
   end
@@ -42,6 +39,5 @@ module WinOrg
     @cols, @rows = `tput cols`.to_i, `tput lines`.to_i
     [@cols, @rows]
   end
-
 
 end

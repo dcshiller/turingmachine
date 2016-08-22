@@ -1,6 +1,4 @@
-# require_relative 'window_organization'
 require 'colorize'
-require 'byebug'
 
 class Panel
   include WinOrg

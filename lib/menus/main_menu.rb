@@ -20,7 +20,12 @@ class MainMenu < Menu
     Proc.new { ProgramReader.new.run_program },
     Proc.new { ProgramEditor.new },
     Proc.new { load_program },
-    Proc.new { full_clear; exit}
+    Proc.new do
+      full_clear;
+      system("setterm -cursor on") #done at exit, but to double-check!
+      STDIN.echo = true
+      exit
+    end
   ]
 
   def initialize

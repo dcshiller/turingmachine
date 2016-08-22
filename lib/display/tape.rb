@@ -18,6 +18,10 @@ class Tape
 		@offset = 0
 	end
 
+	def get_mark_under_reader
+		current_space.read_mark
+	end
+
 	def get_summary
 		left_args = @left.collect {|space| space.read_mark}
 		left_args = left_args.join("").split('0')
@@ -32,10 +36,6 @@ class Tape
 		all_args = left_args.concat(right_args)
 		all_args.delete(0)
 		all_args.join(",")# if all_args
-	end
-
-	def get_mark_under_reader
-		current_space.read_mark
 	end
 
 	def move_one_full(direction)

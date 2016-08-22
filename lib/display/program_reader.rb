@@ -4,7 +4,6 @@ require_relative 'tape'
 require_relative 'display'
 require_relative '../fundamentals/key_input'
 require 'io/wait'
-require 'byebug'
 
 class ProgramReader
 	include KeyInput, WinOrg, MachineWriter
@@ -26,6 +25,8 @@ class ProgramReader
 		reset
 		@first_time = true
 	end
+
+	private
 
 	def handle_input
 		@update[:menu] = true

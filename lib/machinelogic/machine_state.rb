@@ -1,8 +1,15 @@
-
-
 class MachineState
   attr_reader :state_array
 	attr_accessor :number, :instruction_hash
+
+  def initialize(state_number)
+		@number = state_number
+		@instruction_hash = {}
+	end
+
+  def self.connected(state)
+    [state.instruction_hash[:x][1], state.instruction_hash[:"0"][1]]
+  end
 
   def self.get_downstream_states(state, states = [])
     connected_states = MachineState.connected(state)
@@ -13,13 +20,10 @@ class MachineState
     states.uniq.sort {|a,b| a.number <=> b.number}
   end
 
-  def self.connected(state)
-    [state.instruction_hash[:x][1], state.instruction_hash[:"0"][1]]
-  end
-
-	def initialize(state_number)
-		@number = state_number
-		@instruction_hash = {}
+  def self.halt(state_number)
+		halt_state = MachineState.new(state_number)
+		halt_state.set_behavior(:x =>[:halt, halt_state], :"0" => [:halt, halt_state])
+		halt_state
 	end
 
 	def self.make_simple_program
@@ -32,43 +36,26 @@ class MachineState
 		first
 	end
 
-	def self.make_adder
-		first = MachineState.new(1)
-		second = MachineState.new(2)
-		third = MachineState.new(3)
-		fourth = MachineState.new(4)
-		fifth = MachineState.new(5)
-		sixth = MachineState.new(6)
-		last = MachineState.halt(7)
-		first.set_behavior({:x => [:mark0,second], :"0" => [:right,last]})
-		second.set_behavior({:x => [:right,second], :"0" => [:right,third]})
-		third.set_behavior({:x => [:right,third], :"0" => [:right,fourth]})
-		fourth.set_behavior({:x => [:right,fourth], :"0" => [:markx, fifth]})
-		fifth.set_behavior({:x => [:left,fifth], :"0" => [:left,sixth]})
-		sixth.set_behavior({:x => [:left,sixth], :"0" => [:right,first]})
-		#sevent.set_behavior({:x => [:right,sixth], :"0" => [:right,first]})
-		first
-	end
+  def self.make_adder
+    first = MachineState.new(1)
+    second = MachineState.new(2)
+    third = MachineState.new(3)
+    fourth = MachineState.new(4)
+    fifth = MachineState.new(5)
+    sixth = MachineState.new(6)
+    last = MachineState.halt(7)
+    first.set_behavior({:x => [:mark0,second], :"0" => [:right,last]})
+    second.set_behavior({:x => [:right,second], :"0" => [:right,third]})
+    third.set_behavior({:x => [:right,third], :"0" => [:right,fourth]})
+    fourth.set_behavior({:x => [:right,fourth], :"0" => [:markx, fifth]})
+    fifth.set_behavior({:x => [:left,fifth], :"0" => [:left,sixth]})
+    sixth.set_behavior({:x => [:left,sixth], :"0" => [:right,first]})
+    first
+  end
 
   def count
     MachineState.get_downstream_states(self).count
   end
-
-  def to_s
-		number.to_s + ":   (" + instruction_hash.collect {|key, value| key.to_s + "=>" + value.first.to_s + " " + value.last.number.to_s}.join(", ") + ")"
-	end
-
-	def self.halt(state_number)
-		halt_state = MachineState.new(state_number)
-		halt_state.set_behavior(:x =>[:halt, halt_state], :"0" => [:halt, halt_state])
-		halt_state
-	end
-
-	def set_behavior(behavior_hash)
-		default = behavior_hash.default
-		@instruction_hash = @instruction_hash.merge(behavior_hash)
-		@instruction_hash.default = default
-	end
 
 	def get_behavior(input)
 		@instruction_hash[input].first
@@ -115,4 +102,14 @@ class MachineState
     return ones_digits[number] if number < 20
     tens_digits[(number/10)] + ones_digits[(number % 10)]
   end
+
+  def to_s
+		number.to_s + ":   (" + instruction_hash.collect {|key, value| key.to_s + "=>" + value.first.to_s + " " + value.last.number.to_s}.join(", ") + ")"
+	end
+
+	def set_behavior(behavior_hash)
+		default = behavior_hash.default
+		@instruction_hash = @instruction_hash.merge(behavior_hash)
+		@instruction_hash.default = default
+	end
 end
