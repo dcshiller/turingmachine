@@ -21,8 +21,8 @@ class ProgramEditor
     @lselection, @rselection = 0, 0
     @focus = [:left,:right]
 
-    @state_number, @state_if_x, @state_if_o = [""], ["", ""], ["", ""]
-    @program_state_data = [@state_number,@state_if_x,@state_if_o]
+    @state_number, @state_if_x, @state_if_o = [""], ["If X, then ".black, "", ""], ["If 0, then ".black, "", ""]
+    @program_state_data = [@state_number, @state_if_x,@state_if_o]
     selection_loop
   end
 
@@ -77,10 +77,6 @@ class ProgramEditor
     end
   end
 
-  def right_panel_process_text (text, entry_number)
-    (text || " ").colorize(get_right_panel_colors(entry_number))
-  end
-
   def left_panel_content
     num_rows = @rows * 0.8
     if @lselection >= num_rows -1
@@ -132,14 +128,18 @@ class ProgramEditor
 
   def right_panel_content
     return [[""], ["", ""], ["", ""]] if @program_states[@lselection] == nil
-    state_info = @program_states[@lselection].get_state_information_hash
+    state_info = @program_states[@lselection].get_state_information_hash_English
 
     @state_number[0] = (state_info["state_number"] || " ").black
-    @state_if_x[0] = right_panel_process_text("Go " + state_info["input_x_behavior"], 0)
-    @state_if_x[1] = right_panel_process_text(" and go to " + state_info["input_x_state"], 1)
-    @state_if_o[0] = right_panel_process_text("Go " + state_info["input_o_behavior"], 2)
-    @state_if_o[1] = right_panel_process_text(" and go to " + state_info["input_o_state"], 3)
+    @state_if_x[1] = right_panel_process_text(state_info["input_x_behavior"], 0)
+    @state_if_x[2] = right_panel_process_text(" and go to " + state_info["input_x_state"], 1)
+    @state_if_o[1] = right_panel_process_text(state_info["input_o_behavior"], 2)
+    @state_if_o[2] = right_panel_process_text(" and go to " + state_info["input_o_state"], 3)
     @program_state_data
+  end
+
+  def right_panel_process_text (text, entry_number)
+    (text || " ").colorize(get_right_panel_colors(entry_number))
   end
 
   def save

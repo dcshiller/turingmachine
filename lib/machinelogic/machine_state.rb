@@ -87,9 +87,19 @@ class MachineState
   def get_state_information_hash
     {
       "state_number" => number_tag,
-      "input_x_behavior" => get_behavior(:x).to_s,
+      "input_x_behavior" => get_behavior(:x),
       "input_x_state" => get_next_state(:x).number_tag,
-      "input_o_behavior" => get_behavior(:"0").to_s,
+      "input_o_behavior" => get_behavior(:"0"),
+      "input_o_state" => get_next_state(:"0").number_tag
+    }
+  end
+
+  def get_state_information_hash_English
+    {
+      "state_number" => number_tag,
+      "input_x_behavior" => get_behavior_as_string(:x).to_s,
+      "input_x_state" => get_next_state(:x).number_tag,
+      "input_o_behavior" => get_behavior_as_string(:"0").to_s,
       "input_o_state" => get_next_state(:"0").number_tag
     }
   end
