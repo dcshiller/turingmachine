@@ -12,6 +12,10 @@ class Display
     @selection = 0
     @update = update
   end
+  
+  def refresh_program_state(program_state)
+    @program_state = program_state
+  end
 
   def refresh_tape_length
     span = 0.4

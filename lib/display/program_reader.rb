@@ -26,6 +26,15 @@ class ProgramReader
 		@first_time = true
 	end
 
+	def run_program
+		loop do
+			@display.refresh_program_state(@program_state)
+			step_program
+			handle_input if STDIN.ready?
+			break if @done
+		end
+	end
+
 	private
 
 	def handle_input
@@ -71,16 +80,6 @@ class ProgramReader
 		@display.reset(@tape,@log) if @display
 		@update[:tape] = true if @update
 		@program_state = $program
-	end
-
-	def run_program
-		# STDIN.echo = false
-		loop do
-			@display.refresh_program_state(@program_state)
-			step_program
-			handle_input if STDIN.ready?
-			break if @done
-		end
 	end
 
 	def run_program_to_end
