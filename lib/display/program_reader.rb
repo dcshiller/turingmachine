@@ -57,6 +57,7 @@ class ProgramReader
 	end
 
 	def log_write(string)
+		@update[:tape] = true
 		@log << "#{@program_state.number_tag}: #{string}" +
 		" and go to" +
 		" #{@program_state.get_next_state(@tape.get_mark_under_reader).number_tag}"
@@ -75,6 +76,7 @@ class ProgramReader
 	end
 
 	def reset
+		@finished = false
 		set_initial_tape_state
 		@log = []
 		@display.reset(@tape,@log) if @display
@@ -109,13 +111,18 @@ class ProgramReader
 	def step_program(quickly = false)
 		current_mark = @tape.get_mark_under_reader
 		next_action = @program_state.get_behavior(current_mark)
+		return if @finished
 		case next_action
 		when :halt
+			log_write("Halted")
 			@finished = true
 		when :right, :left
 			move(next_action, quickly)
 		when :markx, :mark0
 			write_mark(next_action.to_s[-1].to_sym, quickly)
+		end
+		unless quickly || @finished || STDIN.ready?
+			@display.render_panels
 		end
 		@program_state = @program_state.get_next_state(current_mark)
 	end
