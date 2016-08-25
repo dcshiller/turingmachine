@@ -1,10 +1,10 @@
 # Turing Machine Simulator
 
-See also the [User's Guide](USERSGUIDE.md)
+See also the [User's Guide](USERGUIDE.md)
 
 ## Introduction
 
-This is a ruby terminal program designed to create and display Turing machines.
+This is a Ruby terminal program designed to create and display Turing machines.
 
 Turing machines are abstract computers invented by Alan Turing. A machine consists of a string of tape that is infinite in both directions and segmented into sections. Each section may be blank or contain a symbol. The machine is able to read the symbol at a specific position and then either write a different symbol, move the tape one space to the left or right, or stop running.
 
