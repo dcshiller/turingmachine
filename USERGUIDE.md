@@ -54,6 +54,6 @@ Setting arguments by listing the sequence of series of X's by length. If you wan
 
 The state information panel reports the present state. The log presents the list of states that the machine has gone through. The first number represents the number of steps so far taken. The second number is the state name. The remaining string indicates the behavior given the input.
 
-If you are impatient, the 'Finish' option will run through the remainder of the program without displaying the results. It will process steps on the order of 20,000 steps per second.
+If you are impatient, the 'Finish' option will run through the remainder of the program without displaying the results. It will run through the program on the order of 20,000 steps per second.
 
 The machine can be paused by pressing 'enter', which will shift focus back to the menu.
