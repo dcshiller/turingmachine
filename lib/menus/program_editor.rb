@@ -87,7 +87,7 @@ class ProgramEditor
   end
 
   def load
-    load_program
+    file_name = "./programs/" + full_screen_gets("File name:").chomp + ".tm"
     yaml_program_states = File.read(file_name)
     @program_states = YAML.load(yaml_program_states)
     get_program_state_names
