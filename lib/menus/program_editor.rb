@@ -87,9 +87,12 @@ class ProgramEditor
   end
 
   def load
-    file_name = "./programs/" + full_screen_gets("File name:").chomp + ".tm"
-    yaml_program_states = File.read(file_name)
-    @program_states = YAML.load(yaml_program_states)
+    load_program
+    # file_name = "./programs/" + full_screen_gets("File name:").chomp + ".tm"
+    # yaml_program_states = File.read(file_name)
+    # @program_states = YAML.load(yaml_program_states)
+    # @program_states = YAML.load(yaml_program_states)
+    @program_states = MachineState.get_downstream_states($program)
     get_program_state_names
   end
 
@@ -143,12 +146,12 @@ class ProgramEditor
   end
 
   def save
-    yaml_program_states = YAML.dump(@program_states)
+    yaml_program_states = YAML.dump(MachineState.get_downstream_states(@program_states[0]))
     file_name = "./programs/" + full_screen_gets("File name:").chomp + ".tm"
     File.open(file_name, "w") do |file|
       file.write(yaml_program_states)
     end
-    sleep(3)
+    sleep(1)
   end
 
   def selection_loop
